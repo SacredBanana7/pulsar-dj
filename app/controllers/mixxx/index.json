@@ -1,0 +1,1963 @@
+{
+ "source": "https://github.com/mixxxdj/mixxx/tree/main/res/controllers",
+ "commit": "bc49961fd3e5a46cd46588090c652a0d7ec44e18",
+ "license": "GPL-2.0-or-later",
+ "mappings": [
+  {
+   "file": "Akai-LPD8-RK.midi.xml",
+   "name": "Akai LPD8",
+   "author": "Rob K",
+   "description": "This is a mapping for an Akai LPD8. Provides access to transport controls, 30 hotcues, loop controls, basic beat jumping, for two decks and two samplers. Prog 1 = Deck 1; Prog 2 = Deck 2; Prog 3 = Sampler 1; Prog 4 = Sampler 4. PAD controls hotcues, CC controls Loops, PROG CHNG provides transport co",
+   "forums": "https://mixxx.discourse.group/t/akai-lpd8-mapping-4-decks-30-hotcues-loops-etc-v2/13064",
+   "manual": "akai_lpd8",
+   "controllerId": "LPD8",
+   "devices": [],
+   "scripts": [
+    "Akai-LPD8-RK-scripts.js"
+   ]
+  },
+  {
+   "file": "Akai MPD24.midi.xml",
+   "name": "Akai MPD24",
+   "author": "klico",
+   "description": "MIDI mapping for Akai MPD24",
+   "forums": "https://mixxx.discourse.group/t/akai-mpd24-midi-setup/9020",
+   "manual": "akai_mpd24",
+   "controllerId": "Akai MPD24 MIDI 1",
+   "devices": [],
+   "scripts": []
+  },
+  {
+   "file": "Allen and Heath Xone K2.midi.xml",
+   "name": "Allen&Heath Xone K1/K2/K3",
+   "author": "Be",
+   "description": "This mapping can be used with one or multiple Xone K1s/K2s/K3s. Multiple Xone K1s/K2s/K3s can be connected to each other via X-Link with one of them connected to the computer via USB. Alternatively, when using 2 K1s/K2s/K3s, they can both be connected with their own USB cable and this same mapping c",
+   "forums": "",
+   "manual": "allen_heath_xone_k2_k1",
+   "controllerId": "XONE:K2",
+   "devices": [],
+   "scripts": [
+    "lodash.mixxx.js",
+    "midi-components-0.0.js",
+    "Allen-and-Heath-Xone-K2-scripts.js"
+   ]
+  },
+  {
+   "file": "American Audio RADIUS 2000 CH1.midi.xml",
+   "name": "American Audio Radius 2000 CH1",
+   "author": "Markus Steinbauer",
+   "description": "American Audio Radius 2000 mapping for Deck 1",
+   "forums": "",
+   "manual": "american_audio_radius_2000",
+   "controllerId": "Radius 2000 MIDI 1",
+   "devices": [],
+   "scripts": [
+    "American-Audio-RADIUS-2000-scripts.js"
+   ]
+  },
+  {
+   "file": "American Audio RADIUS 2000 CH2.midi.xml",
+   "name": "American Audio Radius 2000 CH2",
+   "author": "Markus Steinbauer",
+   "description": "American Audio Radius 2000 mapping for Deck 2",
+   "forums": "",
+   "manual": "american_audio_radius_2000",
+   "controllerId": "Radius 2000 MIDI 1",
+   "devices": [],
+   "scripts": [
+    "American-Audio-RADIUS-2000-scripts.js"
+   ]
+  },
+  {
+   "file": "American Audio VMS2.midi.xml",
+   "name": "American Audio VMS2",
+   "author": "Stefan Nuernberger",
+   "description": "MIDI mapping for the American Audio VMS2 controller.",
+   "forums": "http://www.mixxx.org/forums/viewtopic.php?f=7&amp;t=3202",
+   "manual": "american_audio_vms2",
+   "controllerId": "American Audio VMS2",
+   "devices": [],
+   "scripts": [
+    "American-Audio-VMS2-scripts.js"
+   ]
+  },
+  {
+   "file": "American Audio VMS4.midi.xml",
+   "name": "American Audio VMS4/4.1",
+   "author": "Anders Gunnarsson & Sean M. Pappalardo",
+   "description": "2-deck control/4-deck mixer preset for Mixxx 2.1. Assumes \"Post EQ\" mode. (See Wiki for full setup instructions.)",
+   "forums": "",
+   "manual": "american_audio_vms4",
+   "controllerId": "American Audio VMS4",
+   "devices": [],
+   "scripts": [
+    "American-Audio-VMS4-scripts.js"
+   ]
+  },
+  {
+   "file": "ArturiaKeyLab.midi.xml",
+   "name": "Arturia KeyLab Mk 1",
+   "author": "Sam Whited",
+   "description": "MIDI mapping for the original Arturia KeyLab Mk 1",
+   "forums": "https://mixxx.discourse.group/t/arturia-keylab-mk1/31080",
+   "manual": "arturia_keylab_mk1",
+   "controllerId": "ArturiaKeyLabMk1",
+   "devices": [
+    {
+     "protocol": "midi",
+     "vendor_id": "0x1c75",
+     "product_id": "0x02cd"
+    }
+   ],
+   "scripts": [
+    "midi-components-0.0.js",
+    "Arturia-KeyLab-Mk1-scripts.js"
+   ]
+  },
+  {
+   "file": "Behringer BCD2000.midi.xml",
+   "name": "Behringer BCD2000",
+   "author": "Golzo",
+   "description": "MIDI mapping for Behringer BCD2000 mixer",
+   "forums": "http://www.mixxx.org/forums/viewtopic.php?f=7&amp;t=3563",
+   "manual": "behringer_b_control_deejay_bcd2000",
+   "controllerId": "BCD2000 MIDI 1",
+   "devices": [],
+   "scripts": [
+    "Behringer-BCD2000-scripts.js"
+   ]
+  },
+  {
+   "file": "Behringer BCD3000.midi.xml",
+   "name": "Behringer BCD3000",
+   "author": "Aposto",
+   "description": "MIDI Mapping for Behringer BCD3000",
+   "forums": "https://mixxx.discourse.group/t/behringer-bcd3000/10194",
+   "manual": "",
+   "controllerId": "BCD3000 MIDI 1",
+   "devices": [],
+   "scripts": [
+    "Behringer-BCD3000-scripts.js"
+   ]
+  },
+  {
+   "file": "Behringer BCD3000 Advanced.midi.xml",
+   "name": "Behringer BCD3000 Advanced",
+   "author": "Joachim",
+   "description": "Advanced preset for BCD3000. See forums for more information.",
+   "forums": "http://www.mixxx.org/forums/viewtopic.php?f=7&amp;t=4013",
+   "manual": "behringer_b_control_deejay_bcd3000",
+   "controllerId": "BCD3000 MIDI 1",
+   "devices": [],
+   "scripts": [
+    "Behringer-BCD3000-Advanced-scripts.js"
+   ]
+  },
+  {
+   "file": "Behringer BCR2000.midi.xml",
+   "name": "Behringer BCR2000",
+   "author": "Christian",
+   "description": "Mixxx controller preset for a Behringer B-Control BCR2000 controller.",
+   "forums": "",
+   "manual": "",
+   "controllerId": "BCR2000",
+   "devices": [],
+   "scripts": [
+    "midi-components-0.0.js",
+    "Behringer-Extension-scripts.js",
+    "Behringer-BCR2000-preset-scripts.js",
+    "Behringer-BCR2000-scripts.js"
+   ]
+  },
+  {
+   "file": "Behringer CMD Micro.midi.xml",
+   "name": "Behringer CMD Micro",
+   "author": "tecywiz121",
+   "description": "",
+   "forums": "",
+   "manual": "behringer_cmd_micro",
+   "controllerId": "CMD",
+   "devices": [],
+   "scripts": [
+    "Behringer-CMD-Micro-scripts.js"
+   ]
+  },
+  {
+   "file": "Behringer CMD MM1.midi.xml",
+   "name": "Behringer CMD MM-1",
+   "author": "Swiftb0y",
+   "description": "4 deck mapping with options for controlling effect units. Refer to the Mixxx wiki page for how to configure it to control effect units.",
+   "forums": "https://www.mixxx.org/forums/viewtopic.php?f=7&amp;t=9276",
+   "manual": "behringer_cmd_mm_1",
+   "controllerId": "CMD",
+   "devices": [],
+   "scripts": [
+    "common-controller-scripts.js",
+    "lodash.mixxx.js",
+    "midi-components-0.0.js",
+    "Behringer-CMD-MM1-scripts.js"
+   ]
+  },
+  {
+   "file": "Behringer CMDStudio4a.midi.xml",
+   "name": "Behringer CMD STUDIO 4a",
+   "author": "Craig Easton",
+   "description": "Controller mapping for the Behringer CMD STUDIO 4a. V 1.4 Created Jan 2016 for Mixxx 2.0.0",
+   "forums": "http://www.mixxx.org/forums/viewtopic.php?f=7&amp;t=7868",
+   "manual": "behringer_cmd_studio_4a",
+   "controllerId": "Behringer CMD STUDIO 4a",
+   "devices": [],
+   "scripts": [
+    "Behringer-CMDStudio4a-scripts.js"
+   ]
+  },
+  {
+   "file": "Behringer DDM4000.midi.xml",
+   "name": "Behringer DDM4000",
+   "author": "Christian",
+   "description": "Mixxx controller preset for a Behringer DDM4000 mixer.",
+   "forums": "",
+   "manual": "",
+   "controllerId": "DDM4000",
+   "devices": [],
+   "scripts": [
+    "midi-components-0.0.js",
+    "Behringer-Extension-scripts.js",
+    "Behringer-DDM4000-scripts.js"
+   ]
+  },
+  {
+   "file": "Denon DN SC2000.midi.xml",
+   "name": "Denon DN SC2000",
+   "author": "Jan Riewe, Moba",
+   "description": "",
+   "forums": "http://www.mixxx.org/forums/viewtopic.php?f=7&amp;t=2048",
+   "manual": "denon_dn_sc2000",
+   "controllerId": "Denon DN-SC2000",
+   "devices": [],
+   "scripts": [
+    "Denon-DN-SC2000.midi.js"
+   ]
+  },
+  {
+   "file": "Denon DN HS5500.midi.xml",
+   "name": "Denon HS5500",
+   "author": "Owen Williams",
+   "description": "",
+   "forums": "http://www.mixxx.org/forums/viewtopic.php?f=7&amp;t=6547",
+   "manual": "denon_dn_hs5500",
+   "controllerId": "DN-HS5500",
+   "devices": [],
+   "scripts": [
+    "Denon-DN-HS5500-scripts.js"
+   ]
+  },
+  {
+   "file": "Denon MC3000.midi.xml",
+   "name": "Denon MC3000 v0.995",
+   "author": "BeMixxx",
+   "description": "Optimized for Denon MC3000 - Default Midi Channel",
+   "forums": "",
+   "manual": "denon_mc3000",
+   "controllerId": "MC3000 MIDI 1",
+   "devices": [],
+   "scripts": [
+    "Denon-MC3000-scripts.js"
+   ]
+  },
+  {
+   "file": "Denon MC4000.midi.xml",
+   "name": "Denon MC4000",
+   "author": "Tim Rae",
+   "description": "2-deck mapping for Denon MC4000 controller",
+   "forums": "https://mixxx.discourse.group/t/denon-mc4000-mapping/15311",
+   "manual": "denon_mc4000",
+   "controllerId": "MC4000",
+   "devices": [],
+   "scripts": [
+    "Denon-MC4000-scripts.js"
+   ]
+  },
+  {
+   "file": "Denon-MC6000MK2.midi.xml",
+   "name": "Denon MC6000MK2",
+   "author": "Uwe Klotz a/k/a tapir",
+   "description": "",
+   "forums": "http://www.mixxx.org/forums/viewtopic.php?f=7&amp;t=6251",
+   "manual": "denon_mc6000mk2",
+   "controllerId": "MC6000MK2",
+   "devices": [],
+   "scripts": [
+    "lodash.mixxx.js",
+    "midi-components-0.0.js",
+    "Denon-MC6000MK2-scripts.js"
+   ]
+  },
+  {
+   "file": "Denon-MC7000.midi.xml",
+   "name": "Denon MC7000",
+   "author": "OsZ, JL",
+   "description": "A professional 4-channel DJ controller featuring 2 separate audio interfaces. Please refer to the Mixxx user manual to get the audio interfaces working on Linux.",
+   "forums": "https://mixxx.discourse.group/t/denon-mc7000-mapping/18235",
+   "manual": "denon_mc7000",
+   "controllerId": "DENON MC7000",
+   "devices": [],
+   "scripts": [
+    "Denon-MC7000-scripts.js"
+   ]
+  },
+  {
+   "file": "DJTechTools MIDI Fighter.midi.xml",
+   "name": "DJ TechTools MIDI Fighter",
+   "author": "RJ Ryan",
+   "description": "Mapping for DJ TechTools MIDI Fighter Classic Controller",
+   "forums": "",
+   "manual": "dj_techtools_midi_figher_classic",
+   "controllerId": "DJTechTools MIDIFighter",
+   "devices": [],
+   "scripts": [
+    "DJTechTools-MIDIFighter-scripts.js"
+   ]
+  },
+  {
+   "file": "DJ TechTools MIDI Fighter Spectra.midi.xml",
+   "name": "DJ TechTools MIDI Fighter Spectra",
+   "author": "Sam Whited",
+   "description": "Multi-layer mappings for the Spectra.",
+   "forums": "https://mixxx.discourse.group/t/dj-techtools-midi-fighter-spectra/31554",
+   "manual": "dj_techtools_midi_fighter_spectra",
+   "controllerId": "dj-techtools-midi-fighter-spectra",
+   "devices": [
+    {
+     "protocol": "midi",
+     "vendor_id": "0x2580",
+     "product_id": "0x0006"
+    }
+   ],
+   "scripts": [
+    "midi-components-0.0.js",
+    "DJ TechTools-MIDI Fighter Spectra-scripts.js"
+   ]
+  },
+  {
+   "file": "DJ TechTools MIDI Fighter Twister.midi.xml",
+   "name": "DJ TechTools MIDI Fighter Twister",
+   "author": "tock203, Sam Whited",
+   "description": "Control 4 decks with the MIDI Fighter Twister.",
+   "forums": "https://mixxx.discourse.group/t/mapping-the-midifighter-twister/16253",
+   "manual": "dj_techtools_midi_fighter_twister",
+   "controllerId": "DJ TechTools MIDI Fighter Twister",
+   "devices": [
+    {
+     "protocol": "midi",
+     "vendor_id": "0x2580",
+     "product_id": "0x0007"
+    }
+   ],
+   "scripts": [
+    "midi-components-0.0.js",
+    "DJ TechTools-MIDI Fighter Twister-scripts.js"
+   ]
+  },
+  {
+   "file": "DJ-Tech CDJ-101.midi.xml",
+   "name": "DJ-Tech CDJ-101",
+   "author": "zestoi",
+   "description": "Select midi channel 1 or 2 on the CDJ-101 to select which deck to control in Mixxx. Hold down the push encoder for additional controls.",
+   "forums": "http://www.mixxx.org/forums/viewtopic.php?f=7&amp;t=3693",
+   "manual": "dj_tech_cdj_101",
+   "controllerId": "DJ-Tech CDJ-101",
+   "devices": [],
+   "scripts": [
+    "DJ-Tech-CDJ-101-scripts.js"
+   ]
+  },
+  {
+   "file": "DJ-Tech DJM-101.midi.xml",
+   "name": "DJ-Tech DJM-101",
+   "author": "zestoi",
+   "description": "Mapping with full led feedback for the DJ-Tech DJM-101",
+   "forums": "http://www.mixxx.org/forums/viewtopic.php?f=7&amp;t=3693",
+   "manual": "dj_tech_djm_101",
+   "controllerId": "DJM-101",
+   "devices": [],
+   "scripts": [
+    "DJ-Tech-DJM-101-scripts.js"
+   ]
+  },
+  {
+   "file": "DJ-Tech i-Mix Reload.midi.xml",
+   "name": "DJ-Tech i-Mix Reload",
+   "author": "vininim",
+   "description": "MIDI mapping for DJ-Tech i-Mix Reload",
+   "forums": "https://mixxx.discourse.group/t/dj-tech-i-mix-reload-mapping-for-trunk-as-of-date-of-post/10776",
+   "manual": "dj_tech_imix_reload",
+   "controllerId": "DJ-Tech i-Mix Reload",
+   "devices": [],
+   "scripts": [
+    "DJ-Tech-i-Mix-Reload-scripts.js"
+   ]
+  },
+  {
+   "file": "DJ-Tech Kontrol One.midi.xml",
+   "name": "DJ-Tech Kontrol One",
+   "author": "Rob K",
+   "description": "Mapping for the DJ Tech Kontrol One modular scratch controller. Provides controls for Channel1 through Channel4. March 2013.",
+   "forums": "https://mixxx.discourse.group/t/dj-tech-kontrol-one-mapping-hotcue-loops-saves-loops-etc/13299",
+   "manual": "dj_tech_kontrol_one",
+   "controllerId": "KONTROL1",
+   "devices": [],
+   "scripts": [
+    "DJ-Tech-Kontrol-One-scripts.js"
+   ]
+  },
+  {
+   "file": "DJ-Tech Mix-101.midi.xml",
+   "name": "DJ-Tech MIX-101",
+   "author": "rasda",
+   "description": "MIDI mapping for DJ-Tech MIX-101",
+   "forums": "https://mixxx.discourse.group/t/dj-tech-mix-101-mapping/12679",
+   "manual": "dj_tech_mix_101",
+   "controllerId": "Mix-101 MIDI 1",
+   "devices": [],
+   "scripts": []
+  },
+  {
+   "file": "DJ-Tech Mixer One.midi.xml",
+   "name": "DJ-Tech Mixer One",
+   "author": "Rob K",
+   "description": "DJ-Tech Mixer One preset. Pretty straightforward - all controls do what they're labelled to do on the controller, except (1) the Xfader slope knob controls master balance; and (2) the Inverse button mutes the master output momentarily.",
+   "forums": "http://www.mixxx.org/forums/viewtopic.php?f=7&amp;t=4693",
+   "manual": "dj_tech_mixer_one",
+   "controllerId": "MIXER1",
+   "devices": [],
+   "scripts": [
+    "DJ-Tech-Mixer-One-scripts.js"
+   ]
+  },
+  {
+   "file": "Electrix Tweaker.midi.xml",
+   "name": "Electrix Tweaker",
+   "author": "Be",
+   "description": "4-deck mapping for Electrix Tweaker with EQ and loop modes",
+   "forums": "https://mixxx.discourse.group/t/electrix-tweaker-mapping/15071",
+   "manual": "electrix_tweaker",
+   "controllerId": "Tweaker",
+   "devices": [],
+   "scripts": [
+    "Electrix-Tweaker-scripts.js"
+   ]
+  },
+  {
+   "file": "Evolution_Xsession.midi.xml",
+   "name": "Evolution X-Session",
+   "author": "Amias Channer",
+   "description": "MIDI Mapping for Evolution X-Session",
+   "forums": "",
+   "manual": "evolution_x_session",
+   "controllerId": "Evolution Xsession",
+   "devices": [],
+   "scripts": []
+  },
+  {
+   "file": "FaderFoxDJ2.midi.xml",
+   "name": "FaderFox DJ2",
+   "author": "Sacha Berger, Gosseyn",
+   "description": "MIDI Mapping for FaderFoxDJ2",
+   "forums": "",
+   "manual": "faderfox_dj2",
+   "controllerId": "FaderFoxDJ2",
+   "devices": [],
+   "scripts": []
+  },
+  {
+   "file": "Gemini CDMP-7000 L audio.midi.xml",
+   "name": "Gemini CDMP-7000 L",
+   "author": "djtrinidad",
+   "description": "Gemini CDMP-7000 mapping for Deck 1",
+   "forums": "https://mixxx.discourse.group/t/gemini-cdmp-7000-mapping/14482",
+   "manual": "gemini_cdmp_7000",
+   "controllerId": "gemini",
+   "devices": [],
+   "scripts": [
+    "Gemini-CDMP-7000-scripts.js"
+   ]
+  },
+  {
+   "file": "Gemini CDMP-7000 R audio.midi.xml",
+   "name": "Gemini CDMP-7000 R",
+   "author": "djtrinidad",
+   "description": "Gemini CDMP-7000 mapping for Deck 2",
+   "forums": "https://mixxx.discourse.group/t/gemini-cdmp-7000-mapping/14482",
+   "manual": "gemini_cdmp_7000",
+   "controllerId": "gemini",
+   "devices": [],
+   "scripts": [
+    "Gemini-CDMP-7000-scripts.js"
+   ]
+  },
+  {
+   "file": "Gemini FirstMix.midi.xml",
+   "name": "Gemini FirstMix",
+   "author": "mcsquared88",
+   "description": "",
+   "forums": "http://www.mixxx.org/forums/viewtopic.php?f=7&amp;t=3884",
+   "manual": "gemini_firstmix",
+   "controllerId": " firstmix  ",
+   "devices": [],
+   "scripts": [
+    "Gemini-FirstMix-scripts.js"
+   ]
+  },
+  {
+   "file": "Hercules DJ Console 4-Mx.midi.xml",
+   "name": "Hercules DJ Console 4-Mx",
+   "author": "josepma",
+   "description": "Hercules DJ Console 4-Mx 2017-12-16",
+   "forums": "http://www.mixxx.org/forums/viewtopic.php?f=7&amp;t=3023",
+   "manual": "hercules_dj_console_4_mx",
+   "controllerId": "DJ",
+   "devices": [],
+   "scripts": [
+    "Hercules-DJ-Console-4-Mx-scripts.js"
+   ]
+  },
+  {
+   "file": "Hercules DJ Console Mac Edition.midi.xml",
+   "name": "Hercules DJ Console Mac Edition",
+   "author": "Daniel Svensson",
+   "description": "MIDI Mapping for Hercules DJ Console (Mac Edition)",
+   "forums": "",
+   "manual": "hercules_dj_console_mac_edition",
+   "controllerId": "Hercules DJ Console Mac Edition",
+   "devices": [],
+   "scripts": []
+  },
+  {
+   "file": "Hercules DJ Console Mk2.midi.xml",
+   "name": "Hercules DJ Console Mk2",
+   "author": "Garth Dahlstrom",
+   "description": "This is a complete mapping for a Hercules DJ Console Mk2.",
+   "forums": "",
+   "manual": "hercules_dj_console_mk2",
+   "controllerId": "Hercules DJ Console Mk2 MIDI",
+   "devices": [],
+   "scripts": [
+    "Hercules-DJ-Console-Mk2-scripts.js"
+   ]
+  },
+  {
+   "file": "Hercules DJ Console Mk4.midi.xml",
+   "name": "Hercules DJ Console MK4",
+   "author": "Dj kork",
+   "description": "This is a complete mapping for Hercules DJ Console mk4 controller. Requires scripting.",
+   "forums": "http://www.mixxx.org/forums/viewtopic.php?f=7&amp;t=3023",
+   "manual": "hercules_dj_console_mk4",
+   "controllerId": "Hercules DJ Control Mk4 gain v3",
+   "devices": [],
+   "scripts": [
+    "Hercules-DJ-Console-Mk4-scripts.js"
+   ]
+  },
+  {
+   "file": "Hercules DJ Console RMX.midi.xml",
+   "name": "Hercules DJ Console RMX",
+   "author": "Anders Gunnarsson",
+   "description": "Hercules DJ Console RMX controller mapping, v1.9.0. Requires script v1.9.0",
+   "forums": "",
+   "manual": "hercules_dj_console_rmx",
+   "controllerId": "Hercules DJ Console RMX MIDI",
+   "devices": [],
+   "scripts": [
+    "Hercules-DJ-Console-RMX-scripts.js"
+   ]
+  },
+  {
+   "file": "Hercules DJ Console RMX Advanced.midi.xml",
+   "name": "Hercules DJ Console RMX Advanced",
+   "author": "Anders Gunnarsson",
+   "description": "Hercules DJ Console RMX controller mapping with hotcues and loops, v1.9.0. Requires script v1.9.0",
+   "forums": "",
+   "manual": "hercules_dj_console_rmx",
+   "controllerId": "Hercules DJ Console RMX MIDI",
+   "devices": [],
+   "scripts": [
+    "Hercules-DJ-Console-RMX-scripts.js"
+   ]
+  },
+  {
+   "file": "Hercules DJ Console RMX 2.midi.xml",
+   "name": "Hercules DJ Console RMX2",
+   "author": "Circuitfry",
+   "description": "This console's mapping comes with a script.",
+   "forums": "",
+   "manual": "hercules_dj_console_rmx2",
+   "controllerId": "DJConsole",
+   "devices": [],
+   "scripts": [
+    "Hercules-DJ-Console-RMX-2-scripts.js"
+   ]
+  },
+  {
+   "file": "Hercules DJ Control AIR.midi.xml",
+   "name": "Hercules DJ Control AIR",
+   "author": "rojaro",
+   "description": "Mapping for Hercules DJ Control AIR",
+   "forums": "http://www.mixxx.org/forums/viewtopic.php?f=7&amp;t=3263",
+   "manual": "hercules_djcontrol_air",
+   "controllerId": "DJ Control Air",
+   "devices": [],
+   "scripts": [
+    "Hercules-DJ-Control-AIR-scripts.js"
+   ]
+  },
+  {
+   "file": "Hercules DJ Control Instinct.midi.xml",
+   "name": "Hercules DJ Control Instinct",
+   "author": "Mich Wyser",
+   "description": "",
+   "forums": "http://www.mixxx.org/forums/viewtopic.php?f=7&amp;t=3907",
+   "manual": "hercules_djcontrol_instinct",
+   "controllerId": "Hercules DJControl Instinct MID",
+   "devices": [],
+   "scripts": [
+    "Hercules-DJ-Control-Instinct-scripts.js"
+   ]
+  },
+  {
+   "file": "Hercules DJ Control MP3.midi.xml",
+   "name": "Hercules DJ Control MP3",
+   "author": "Vittorio Colao",
+   "description": "Complete mapping for Hercules DJ Control MP3.",
+   "forums": "",
+   "manual": "hercules_djcontrol_mp3",
+   "controllerId": "Hercules DJ Control MP3 MIDI",
+   "devices": [],
+   "scripts": [
+    "Hercules-DJ-Control-MP3-scripts.js"
+   ]
+  },
+  {
+   "file": "Hercules DJ Control MP3 e2.midi.xml",
+   "name": "Hercules DJ Control MP3 e2 / MP3 LE / Glow",
+   "author": "Gianfe, Taucher and SBlaisot",
+   "description": "Hercules DJ Control MP3 e2 / MP3 LE / Glow mapping. These three controllers have identical controls and share the same mapping.",
+   "forums": "https://mixxx.discourse.group/t/hercules-dj-control-mp3-e2-4-deck-mapping-for-mixxx-1-12/15056",
+   "manual": "hercules_djcontrol_mp3_e2",
+   "controllerId": "Hercules DJ Control MP3 e2",
+   "devices": [],
+   "scripts": [
+    "Hercules DJ Control MP3 e2-scripts.js"
+   ]
+  },
+  {
+   "file": "Hercules DJ Control Steel.midi.xml",
+   "name": "Hercules DJ Control Steel",
+   "author": "Stephane List, from the work of Anders Gunnarsson",
+   "description": "Hercules DJ Control Steel controller mapping, v1.8.1. Requires script v1.8.1",
+   "forums": "",
+   "manual": "",
+   "controllerId": "Hercules DJ Control Steel MIDI",
+   "devices": [],
+   "scripts": [
+    "Hercules-DJ-Control-Steel-scripts.js"
+   ]
+  },
+  {
+   "file": "Hercules DJControl Compact.midi.xml",
+   "name": "Hercules DJControl Compact",
+   "author": "Owen Williams",
+   "description": "Controller mapping for Hercules DJControl Compact. Users who want the labeled \"mid\" knob to adjust high eq instead may use the MIDI wizard to remap it, or edit the controller XML file directly to change this setting.",
+   "forums": "",
+   "manual": "hercules_djcontrol_compact",
+   "controllerId": "DJControl",
+   "devices": [],
+   "scripts": [
+    "Hercules-DJControl-Compact-scripts.js"
+   ]
+  },
+  {
+   "file": "Hercules_DJControl_Inpulse_200.midi.xml",
+   "name": "Hercules DJControl Inpulse 200",
+   "author": "DJ Phatso for Hercules Technical Support",
+   "description": "MIDI Preset for Hercules DJControl Inpulse 200",
+   "forums": "https://www.mixxx.org/forums/viewtopic.php?f=7&amp;t=12592",
+   "manual": "",
+   "controllerId": "DJControl Inpulse 200",
+   "devices": [],
+   "scripts": [
+    "lodash.mixxx.js",
+    "midi-components-0.0.js",
+    "Hercules-DJControl-Inpulse-200-script.js"
+   ]
+  },
+  {
+   "file": "Hercules_DJControl_Inpulse_300.midi.xml",
+   "name": "Hercules DJControl Inpulse 300",
+   "author": "DJ Phatso for Hercules Technical Support",
+   "description": "MIDI Preset for Hercules DJControl Inpulse 300",
+   "forums": "https://www.mixxx.org/forums/viewtopic.php?f=7&amp;t=12599",
+   "manual": "",
+   "controllerId": "DJControl Inpulse 300",
+   "devices": [],
+   "scripts": [
+    "lodash.mixxx.js",
+    "midi-components-0.0.js",
+    "Hercules-DJControl-Inpulse-300-script.js"
+   ]
+  },
+  {
+   "file": "Hercules_DJControl_Inpulse_500.midi.xml",
+   "name": "Hercules DJControl Inpulse 500",
+   "author": "DJ Phatso, Event1ne and Reset Reboot",
+   "description": "MIDI Preset for Hercules DJControl Inpulse 500",
+   "forums": "https://mixxx.discourse.group/t/hercules-djcontrol-inpulse-500/19739",
+   "manual": "",
+   "controllerId": "DJControl Inpulse 500",
+   "devices": [],
+   "scripts": [
+    "midi-components-0.0.js",
+    "Hercules-DJControl-Inpulse-500-script.js"
+   ]
+  },
+  {
+   "file": "Hercules_DJControl_Jogvision.midi.xml",
+   "name": "Hercules DJControl Jogvision",
+   "author": "DJ Phatso for Hercules Technical Support",
+   "description": "MIDI Mapping for Hercules DJControl Jogvision",
+   "forums": "https://www.mixxx.org/forums/viewtopic.php?f=7&amp;t=12580",
+   "manual": "hercules_djcontrol_jogvision",
+   "controllerId": "Hercules DJControl Jogvision",
+   "devices": [],
+   "scripts": [
+    "lodash.mixxx.js",
+    "midi-components-0.0.js",
+    "Hercules_DJControl_Jogvision-scripts.js"
+   ]
+  },
+  {
+   "file": "Hercules DJControl MIX.midi.xml",
+   "name": "Hercules DJControl MIX",
+   "author": "DJ Phatso for Hercules Technical Support, contributions by Kerrick Staley",
+   "description": "MIDI Mapping for Hercules DJControl MIX",
+   "forums": "https://mixxx.discourse.group/t/hercules-contrl-mix-mapping/26581/",
+   "manual": "hercules_djcontrol_MIX",
+   "controllerId": "DJControl MIX",
+   "devices": [],
+   "scripts": [
+    "lodash.mixxx.js",
+    "midi-components-0.0.js",
+    "Hercules-DJControl-MIX-scripts.js"
+   ]
+  },
+  {
+   "file": "Hercules DJControl Starlight.midi.xml",
+   "name": "Hercules DJControl Starlight",
+   "author": "DJ Phatso for Hercules Technical Support, contributions by Kerrick Staley",
+   "description": "MIDI Preset for Hercules DJControl Starlight",
+   "forums": "https://mixxx.discourse.group/t/hercules-djcontrol-starlight/17833",
+   "manual": "hercules_djcontrol_starlight",
+   "controllerId": "DJControl Starlight",
+   "devices": [],
+   "scripts": [
+    "lodash.mixxx.js",
+    "midi-components-0.0.js",
+    "Hercules-DJControl-Starlight-scripts.js"
+   ]
+  },
+  {
+   "file": "Hercules P32 DJ.midi.xml",
+   "name": "Hercules P32 DJ",
+   "author": "Be",
+   "description": "4-deck mapping for Hercules P32 controller",
+   "forums": "https://mixxx.discourse.group/t/hercules-p32-dj-controller-mapping/15804",
+   "manual": "hercules_p32_dj",
+   "controllerId": "Hercules",
+   "devices": [],
+   "scripts": [
+    "lodash.mixxx.js",
+    "midi-components-0.0.js",
+    "Hercules-P32-scripts.js"
+   ]
+  },
+  {
+   "file": "Icon-iControls.midi.xml",
+   "name": "Icon iControls",
+   "author": "Sam Whited",
+   "description": "MIDI mapping for the iControls by Icon Pro Audio.",
+   "forums": "https://mixxx.discourse.group/t/icon-pro-audio-icontrols/31593",
+   "manual": "icon_icontrols",
+   "controllerId": "icon-icontrols",
+   "devices": [
+    {
+     "protocol": "midi",
+     "vendor_id": "0x1d03",
+     "product_id": "0x001a"
+    }
+   ],
+   "scripts": [
+    "midi-components-0.0.js",
+    "Icon-iControls-scripts.js"
+   ]
+  },
+  {
+   "file": "Icon-P1Nano.midi.xml",
+   "name": "Icon P1-Nano MIDI 1",
+   "author": "Sam Whited",
+   "description": "MIDI mapping for the Icon P1-Nano controller and D-5 display.",
+   "forums": "https://mixxx.discourse.group/t/icon-pro-audio-p1-nano/31630",
+   "manual": "icon_p1_nano",
+   "controllerId": "icon-p1nano",
+   "devices": [
+    {
+     "protocol": "midi",
+     "vendor_id": "0x1d03",
+     "product_id": "0x0806"
+    }
+   ],
+   "scripts": [
+    "midi-components-0.0.js",
+    "Icon-P1Nano-scripts.js"
+   ]
+  },
+  {
+   "file": "Intech TEK2.midi.xml",
+   "name": "Intech TEK2",
+   "author": "",
+   "description": "MIDI Learned from 2 messages.",
+   "forums": "",
+   "manual": "intech_TEK2",
+   "controllerId": "TEK2",
+   "devices": [],
+   "scripts": [
+    "Intech TEK2.scripts.js"
+   ]
+  },
+  {
+   "file": "Ion Discover DJ.midi.xml",
+   "name": "Ion Discover DJ",
+   "author": "Rick Prokup",
+   "description": "This preset provides functionality for the Ion Discover DJ controller for Mixxx",
+   "forums": "http://www.mixxx.org/forums/viewtopic.php?f=7&amp;t=939",
+   "manual": "ion_discover_dj",
+   "controllerId": "Ion",
+   "devices": [],
+   "scripts": [
+    "Ion-Discover-DJ-scripts.js"
+   ]
+  },
+  {
+   "file": "Ion-Discover-DJ-Pro.midi.xml",
+   "name": "Ion Discover DJ Pro",
+   "author": "joachim,meltedpianoman",
+   "description": "A mapping for the Ion Discover DJ Pro, a 2-deck controller with integrated audio interface and iPhone dock.",
+   "forums": "https://mixxx.org/forums/viewtopic.php?f=7&amp;t=3343",
+   "manual": "",
+   "controllerId": "DISCOVER DJ PRO MIDI 1",
+   "devices": [],
+   "scripts": [
+    "Ion-Discover-DJ-Pro-scripts.js"
+   ]
+  },
+  {
+   "file": "KANE_QuNeo.midi.xml",
+   "name": "Keith McMillen Instruments QuNeo",
+   "author": "Daniel Leja",
+   "description": "This is a fully customized DJ mapping for the QuNeo, complete with beat-jumping and pulsing LED sequencers.",
+   "forums": "https://mixxx.discourse.group/viewtopic.php?f=7&amp;amp;t=4130&amp;amp;sid=bc90140a4dc6e650e06dae0df8562604",
+   "manual": "keith_mcmillen_quneo",
+   "controllerId": "QUNEO",
+   "devices": [],
+   "scripts": [
+    "KANE_QuNeo_scripts.js"
+   ]
+  },
+  {
+   "file": "Kontrol Dj KDJ500.midi.xml",
+   "name": "Kontrol DJ KDJ500",
+   "author": "bonkhead and dnine",
+   "description": "",
+   "forums": "http://www.mixxx.org/forums/viewtopic.php?f=7&amp;t=1609",
+   "manual": "kontrol_dj_kdj500",
+   "controllerId": "KDJ500",
+   "devices": [],
+   "scripts": [
+    "Kontrol-Dj-KDJ500-scripts.js"
+   ]
+  },
+  {
+   "file": "Korg-KAOSS-DJ.midi.xml",
+   "name": "Korg KAOSS DJ",
+   "author": "Seb Dooris, Fayaaz Ahmed, Lee Arromba, Raphael Quast",
+   "description": "Controller mapping for the Korg KAOSS DJ Controller.",
+   "forums": "https://www.mixxx.org/forums/viewtopic.php?f=7&amp;t=8479",
+   "manual": "",
+   "controllerId": "KAOSS",
+   "devices": [],
+   "scripts": [
+    "Korg-KAOSS-DJ-scripts.js"
+   ]
+  },
+  {
+   "file": "Korg nanoKONTROL.midi.xml",
+   "name": "Korg nanoKONTROL",
+   "author": "ePoxi",
+   "description": "You must load the scene file first. Download it from the forums.",
+   "forums": "http://www.mixxx.org/forums/viewtopic.php?f=7&amp;t=1999",
+   "manual": "korg_nanokontrol",
+   "controllerId": "nanoKONTROL MIDI 1",
+   "devices": [],
+   "scripts": []
+  },
+  {
+   "file": "Korg nanoKONTROL 2.midi.xml",
+   "name": "Korg nanoKONTROL2",
+   "author": "Rob K",
+   "description": "Controller mapping for the Korg Nanokontrol 2. Intended to supplement a standard DJ controller setup. Dedicated volume faders, and a large variety of controls for eight decks. Gives access to a lot of controls that wouldn't normally have room to be mapped onto a standard controller. Created Feb 2013",
+   "forums": "http://www.mixxx.org/forums/viewtopic.php?f=7&amp;t=4759",
+   "manual": "korg_nanokontrol2",
+   "controllerId": "NK2",
+   "devices": [],
+   "scripts": [
+    "Korg-nanoKONTROL-2-scripts.js"
+   ]
+  },
+  {
+   "file": "Korg nanoPAD2.midi.xml",
+   "name": "Korg nanoPAD2",
+   "author": "Rob K",
+   "description": "This is a mapping for a Korg nanoPAD2. It provides 16 hotcue controls for deck 1, 14 for deck 2, with the ability to clear each hotcue. Also provides loop controls, kill frequency switches, mute button, reverse play, etc.",
+   "forums": "https://mixxx.discourse.group/t/akai-lpd8-mapping-4-decks-30-hotcues-loops-etc-v2/13064",
+   "manual": "korg_nanopad2",
+   "controllerId": "NANOPAD2",
+   "devices": [],
+   "scripts": [
+    "Korg-nanoPAD2-scripts.js"
+   ]
+  },
+  {
+   "file": "M-Audio_Xsession_pro.midi.xml",
+   "name": "M-Audio X-Session Pro",
+   "author": "Karli",
+   "description": "MIDI Mapping for M-Audio X-Session Pro",
+   "forums": "",
+   "manual": "m_audio_x_session_pro",
+   "controllerId": "M-Audio Xsession pro",
+   "devices": [],
+   "scripts": []
+  },
+  {
+   "file": "MVave-SMC-Mixer.midi.xml",
+   "name": "M-Vave SMC-Mixer",
+   "author": "Sam Whited",
+   "description": "MIDI mapping for the M-Vave SMC-Mixer.",
+   "forums": "https://mixxx.discourse.group/t/m-wave-sinco-smc-mixer-radio-broadcast-mapping/30366",
+   "manual": "mvave_smc_mixer",
+   "controllerId": "mvave-smc-mixer",
+   "devices": [
+    {
+     "protocol": "midi",
+     "vendor_id": "0x4353",
+     "product_id": "0x4b4d"
+    }
+   ],
+   "scripts": [
+    "midi-components-0.0.js",
+    "MVave-SMC-Mixer-scripts.js"
+   ]
+  },
+  {
+   "file": "MVave-SMK-25-II.midi.xml",
+   "name": "M-Vave SMK-25 II",
+   "author": "Sam Whited",
+   "description": "MIDI mapping for the M-Vave SMK-25 II piano keyboard.",
+   "forums": "https://mixxx.discourse.group/t/sinco-m-wave-smk-25-ii/31350",
+   "manual": "mvave_smk-25-ii",
+   "controllerId": "mvave-smk-25-ii",
+   "devices": [
+    {
+     "protocol": "midi",
+     "vendor_id": "0x4353",
+     "product_id": "0x4b4d"
+    }
+   ],
+   "scripts": [
+    "midi-components-0.0.js",
+    "MVave-SMK-25-II-scripts.js"
+   ]
+  },
+  {
+   "file": "Midi_for_light.midi.xml",
+   "name": "MIDI for light",
+   "author": "Michael Stahl / DG3NEC",
+   "description": "MIDI-output for light control",
+   "forums": "https://mixxx.discourse.group/t/midi-for-light/15513",
+   "manual": "",
+   "controllerId": "midi_for_light Control",
+   "devices": [],
+   "scripts": [
+    "Midi_for_light-scripts.js"
+   ]
+  },
+  {
+   "file": "Midi-Keyboard.midi.xml",
+   "name": "MIDI Keyboard",
+   "author": "",
+   "description": "Generic MIDI Keyboard Mapping",
+   "forums": "",
+   "manual": "",
+   "controllerId": "Midi-Keyboard",
+   "devices": [],
+   "scripts": []
+  },
+  {
+   "file": "MidiTech-MidiControl.midi.xml",
+   "name": "MidiTech MidiControl",
+   "author": "",
+   "description": "MIDI Mapping for MidiTech MidiControl",
+   "forums": "",
+   "manual": "miditech_midicontrol",
+   "controllerId": "MidiTech-MidiControl",
+   "devices": [],
+   "scripts": []
+  },
+  {
+   "file": "Mixman DM2 (Linux).midi.xml",
+   "name": "Mixman DM2 (Linux)",
+   "author": "Jan Jockusch",
+   "description": "This is the DM2 mapping for the Linux driver (dm2linux.sourceforge.net)",
+   "forums": "",
+   "manual": "mixman_dm2",
+   "controllerId": "Mixman DM2 (Linux)",
+   "devices": [],
+   "scripts": [
+    "Mixman DM2 (Linux).js"
+   ]
+  },
+  {
+   "file": "Mixman DM2 (OS X).midi.xml",
+   "name": "Mixman DM2 (OS X)",
+   "author": "Joe M.",
+   "description": "MIDI Mapping for Mixman DM2 (OS/X Version)",
+   "forums": "",
+   "manual": "mixman_dm2",
+   "controllerId": "Mixman DM2",
+   "devices": [],
+   "scripts": [
+    "Mixman DM2 (OS X).js"
+   ]
+  },
+  {
+   "file": "Mixman DM2 (Windows).midi.xml",
+   "name": "Mixman DM2 (Windows)",
+   "author": "Joe M.",
+   "description": "MIDI Mapping for Mixman DM2 (Windows)",
+   "forums": "",
+   "manual": "mixman_dm2",
+   "controllerId": "Mixman DM2 (Windows)",
+   "devices": [],
+   "scripts": []
+  },
+  {
+   "file": "MixVibes U-Mix Control 2.midi.xml",
+   "name": "MixVibes U-Mix Control 2",
+   "author": "peper",
+   "description": "A beta v0.2 preset for the MixVibes U-Mix Control 2.",
+   "forums": "http://www.mixxx.org/forums/viewtopic.php?f=7&amp;t=4469",
+   "manual": "mixvibes_u_mix_control_2",
+   "controllerId": "MixVibes U-MIX CONTROL 2 MIDI 1",
+   "devices": [],
+   "scripts": []
+  },
+  {
+   "file": "MixVibes U-Mix Control Pro 2.midi.xml",
+   "name": "MixVibes U-Mix Control Pro 2",
+   "author": "tomtom (thomas-8)",
+   "description": "V1.0.0 -> Please visit Forum and Wiki for more details.",
+   "forums": "https://mixxx.discourse.group/t/v1-0-mixvibes-u-mix-control-pro-2-mapping/13322",
+   "manual": "mixvibes_u_mix_control_2",
+   "controllerId": "MixVibes",
+   "devices": [],
+   "scripts": [
+    "MixVibes-U-Mix-Control-Pro-2-scripts.js"
+   ]
+  },
+  {
+   "file": "Traktor Kontrol X1.midi.xml",
+   "name": "Native Instruments Traktor Kontrol X1",
+   "author": "Ilkka Tuohela <hile@iki.fi>",
+   "description": "MIDI mapping for Native Instruments Traktor Kontrol X1.",
+   "forums": "http://www.mixxx.org/forums/viewtopic.php?f=7&amp;t=3809",
+   "manual": "native_instruments_traktor_kontrol_x1",
+   "controllerId": "KontrolX1",
+   "devices": [],
+   "scripts": [
+    "Traktor-Kontrol-X1.js"
+   ]
+  },
+  {
+   "file": "Novation Dicer.midi.xml",
+   "name": "Novation Dicer",
+   "author": "Shaun (DJPandemonium@gmail.com)",
+   "description": "Implements cuepoints, looping, loop rolls, basic effects, and navigation.",
+   "forums": "https://mixxx.discourse.group/t/novation-dicer-mapping/12329",
+   "manual": "novation_dicer",
+   "controllerId": "Dicer Novation Dicer",
+   "devices": [],
+   "scripts": [
+    "Novation-Dicer-scripts.js"
+   ]
+  },
+  {
+   "file": "Novation Launchpad.midi.xml",
+   "name": "Novation Launchpad",
+   "author": "Midiparse",
+   "description": "Novation Launchpad MK1 mapping for Mixxx",
+   "forums": "https://github.com/dszakallas/mixxx-launchpad",
+   "manual": "",
+   "controllerId": "Novation Launchpad",
+   "devices": [],
+   "scripts": [
+    "Novation-Launchpad-scripts.js"
+   ]
+  },
+  {
+   "file": "Novation-Launchpad-Mini.midi.xml",
+   "name": "Novation Launchpad Mini",
+   "author": "marczis",
+   "description": "Multi page mapping for the Novation Launchpad Mini",
+   "forums": "https://mixxx.discourse.group/t/novation-launchpad-mini-mapping-official-forum/14299",
+   "manual": "novation_launchpad_mini",
+   "controllerId": "Novation Launchpad Mini",
+   "devices": [],
+   "scripts": [
+    "Novation-Launchpad-Mini-scripts.js"
+   ]
+  },
+  {
+   "file": "Novation Launchpad Mini MK3.midi.xml",
+   "name": "Novation Launchpad Mini MK3",
+   "author": "Christian Neumann",
+   "description": "Novation Launchpad Mini MK3 mapping for Mixxx",
+   "forums": "https://github.com/dszakallas/mixxx-launchpad",
+   "manual": "",
+   "controllerId": "Novation Launchpad Mini MK3",
+   "devices": [],
+   "scripts": [
+    "Novation-Launchpad Mini MK3-scripts.js"
+   ]
+  },
+  {
+   "file": "Novation Launchpad MK2.midi.xml",
+   "name": "Novation Launchpad MK2",
+   "author": "Midiparse",
+   "description": "Novation Launchpad MK2 mapping for Mixxx",
+   "forums": "https://github.com/dszakallas/mixxx-launchpad",
+   "manual": "",
+   "controllerId": "Novation Launchpad MK2",
+   "devices": [],
+   "scripts": [
+    "Novation-Launchpad MK2-scripts.js"
+   ]
+  },
+  {
+   "file": "Numark DJ2Go.midi.xml",
+   "name": "Numark DJ2Go",
+   "author": "Alimantado, mod by Coval",
+   "description": "11-Sep-2012. Made to be close as possible to how DJ2Go works with VDJ.",
+   "forums": "http://www.mixxx.org/forums/viewtopic.php?f=7&amp;t=2732&amp;start=140&amp;sid=da4226f3f9a11932881d0e609ee7f2cc",
+   "manual": "numark_dj2go",
+   "controllerId": "Numark DJ2Go MIDI 1",
+   "devices": [],
+   "scripts": [
+    "Numark-DJ2Go-scripts.js"
+   ]
+  },
+  {
+   "file": "Numark_DJ2GO2_Touch.midi.xml",
+   "name": "Numark DJ2GO2 Touch",
+   "author": "tandy1000",
+   "description": "Numark DJ2GO2 Touch Mapping",
+   "forums": "",
+   "manual": "",
+   "controllerId": "Numark DJ2GO2 Touch",
+   "devices": [],
+   "scripts": [
+    "lodash.mixxx.js",
+    "midi-components-0.0.js",
+    "Numark_DJ2GO2_Touch_scripts.js"
+   ]
+  },
+  {
+   "file": "Numark iDJ Live II.midi.xml",
+   "name": "Numark iDJ Live II",
+   "author": "Nathan Korth",
+   "description": "Complete mapping for iDJ Live II",
+   "forums": "",
+   "manual": "numark_idj_live_ii",
+   "controllerId": "Numark",
+   "devices": [],
+   "scripts": [
+    "Numark-iDJ-Live-II-scripts.js"
+   ]
+  },
+  {
+   "file": "Numark-Mixstream-Pro.midi.xml",
+   "name": "Numark Mixstream Pro",
+   "author": "danielkinahan and ptrex (aka audministrator)",
+   "description": "Master Volume",
+   "forums": "https://mixxx.discourse.group/t/numark-mixstream-pro-mapping/24858",
+   "manual": "",
+   "controllerId": "MixstreamPro",
+   "devices": [],
+   "scripts": [
+    "midi-components-0.0.js",
+    "Numark-Mixstream-Pro.scripts.js"
+   ]
+  },
+  {
+   "file": "Numark MIXTRACK.midi.xml",
+   "name": "Numark MIXTRACK",
+   "author": "Matteo (matteo@magm3.com), RAWRR, and uncleeugene",
+   "description": "Numark MixTrack Mapping v1.0b",
+   "forums": "",
+   "manual": "numark_mixtrack",
+   "controllerId": "Numark Mix Track MIDI 1",
+   "devices": [],
+   "scripts": [
+    "Numark-MixTrack-scripts.js"
+   ]
+  },
+  {
+   "file": "Numark-Mixtrack-3.midi.xml",
+   "name": "Numark Mixtrack (Pro) 3",
+   "author": "Stéphane Morin",
+   "description": "The Numark Mixtrack 3 and Numark Mixtrack Pro 3 are the same controller except that the Pro version has an integrated sound card.",
+   "forums": "https://mixxx.discourse.group/t/mixtrack-pro-3/15165",
+   "manual": "",
+   "controllerId": "Mixtrack3",
+   "devices": [],
+   "scripts": [
+    "Numark-Mixtrack-3-scripts.js"
+   ]
+  },
+  {
+   "file": "Numark Mixtrack 2.midi.xml",
+   "name": "Numark MixTrack (Pro) II",
+   "author": "SNOWY, Armen Rizal, ninomp, special thanks to Thomas Preston and Ricecows (rj@ricecows.net)",
+   "description": "Version v2.0",
+   "forums": "",
+   "manual": "numark_mixtrack_pro_ii",
+   "controllerId": "MixTrack",
+   "devices": [],
+   "scripts": [
+    "Numark-Mixtrack-2-scripts.js"
+   ]
+  },
+  {
+   "file": "Numark Mixtrack Platinum.midi.xml",
+   "name": "Numark Mixtrack Platinum",
+   "author": "Matthew Nicholson",
+   "description": "Numark Mixtrack Platinum mapping with support for LCD screens and 4 deck playback.",
+   "forums": "https://www.mixxx.org/forums/viewtopic.php?f=7&amp;t=8863",
+   "manual": "",
+   "controllerId": "MixTrack",
+   "devices": [],
+   "scripts": [
+    "lodash.mixxx.js",
+    "midi-components-0.0.js",
+    "Numark-Mixtrack-Platinum-scripts.js"
+   ]
+  },
+  {
+   "file": "Numark Mixtrack Platinum FX.midi.xml",
+   "name": "Numark Mixtrack Platinum FX",
+   "author": "Evoixmr mixxx 2.4 version updated from - QGazQ tweaks of Octopussy based on mapping from h67ma, bad1dea5, photoenix, Matthew Nicholson, Ending, Kaj Bostrom",
+   "description": "Mapping for the Numark Mixtrack Platinum FX.",
+   "forums": "https://mixxx.discourse.group/t/numark-mixtrack-platinum-fx-mapping/19985",
+   "manual": "",
+   "controllerId": "MixTrack",
+   "devices": [],
+   "scripts": [
+    "lodash.mixxx.js",
+    "midi-components-0.0.js",
+    "Numark-Mixtrack-Platinum-FX-scripts.js"
+   ]
+  },
+  {
+   "file": "Numark Mixtrack Pro.midi.xml",
+   "name": "Numark MixTrack Pro",
+   "author": "Matteo (matteo@magm3.com), James Ralston, and D. J. Freije (dario2004@gmail.com)",
+   "description": "version v1.2 w/brake, backspin, blink beat Leds.",
+   "forums": "https://mixxx.discourse.group/t/numark-mixtrack-pro-with-backspin-and-more/12557",
+   "manual": "numark_mixtrack_pro",
+   "controllerId": "Numark Mix Track Pro MIDI 1",
+   "devices": [],
+   "scripts": [
+    "Numark-Mixtrack-Pro-scripts.js"
+   ]
+  },
+  {
+   "file": "Numark Mixtrack Pro FX.midi.xml",
+   "name": "Numark Mixtrack Pro FX",
+   "author": "h67ma, bad1dea5, photoenix",
+   "description": "Mapping for the Numark Mixtrack Pro FX",
+   "forums": "https://mixxx.discourse.group/t/numark-mixtrack-pro-fx/19561",
+   "manual": "numark_mixtrack_pro_fx",
+   "controllerId": "MixTrack",
+   "devices": [],
+   "scripts": [
+    "lodash.mixxx.js",
+    "midi-components-0.0.js",
+    "Numark-Mixtrack-Pro-FX-scripts.js"
+   ]
+  },
+  {
+   "file": "Numark N4.midi.xml",
+   "name": "Numark N4",
+   "author": "Swiftb0y",
+   "description": "4 channel MIDI Mapping for Numark N4",
+   "forums": "",
+   "manual": "numark_n4",
+   "controllerId": "N4 MIDI 1",
+   "devices": [],
+   "scripts": [
+    "common-controller-scripts.js",
+    "lodash.mixxx.js",
+    "midi-components-0.0.js",
+    "Numark-N4-scripts.js"
+   ]
+  },
+  {
+   "file": "Numark NS4FX.midi.xml",
+   "name": "Numark NS4FX",
+   "author": "Tomáš Bažant, Erik Puschendorf, Matthew Nicholson",
+   "description": "Numark NS4FX mapping with support for LCD screens and 4 deck playback.",
+   "forums": "https://www.mixxx.org/forums/viewtopic.php?f=7&amp;t=8863",
+   "manual": "",
+   "controllerId": "NS4FX",
+   "devices": [],
+   "scripts": [
+    "lodash.mixxx.js",
+    "midi-components-0.0.js",
+    "Numark-NS4FX-scripts.js"
+   ]
+  },
+  {
+   "file": "Numark NS6II.midi.xml",
+   "name": "Numark NS6II",
+   "author": "Swiftb0y",
+   "description": "Mapping for the Numark NS6II controller. It is able to fully communicate with the integrated screens. You can manipulate the Beatgrid of the track via the slicer pad page (since mixxx doesn't have slicer capabilities)",
+   "forums": "",
+   "manual": "",
+   "controllerId": "NS6",
+   "devices": [],
+   "scripts": [
+    "lodash.mixxx.js",
+    "midi-components-0.0.js",
+    "common-controller-scripts.js",
+    "Numark-NS6II-scripts.js"
+   ]
+  },
+  {
+   "file": "Numark NS7.midi.xml",
+   "name": "Numark NS7",
+   "author": "Anders Gunnarsson",
+   "description": "Numark NS7 controller preliminary mapping, v1.9.0 Requires script v1.9.0",
+   "forums": "",
+   "manual": "numark_ns7",
+   "controllerId": "Numark NS7 MIDI",
+   "devices": [],
+   "scripts": [
+    "Numark-NS7-scripts.js"
+   ]
+  },
+  {
+   "file": "Numark Omni Control.midi.xml",
+   "name": "Numark Omni Control",
+   "author": "Baxter",
+   "description": "Adaptation from the work of Smashuu and David Gnedt",
+   "forums": "",
+   "manual": "numark_omni_control",
+   "controllerId": "Numark OMNI CONTROL MIDI",
+   "devices": [],
+   "scripts": [
+    "Numark-Omni-Control-scripts.js"
+   ]
+  },
+  {
+   "file": "Numark-Party-Mix.midi.xml",
+   "name": "Numark Party Mix",
+   "author": "olaf",
+   "description": "Full Mappings for Numark Party Mix including selectable pad modes",
+   "forums": "https://www.mixxx.org/forums/viewtopic.php?f=7&amp;t=9232",
+   "manual": "",
+   "controllerId": "Numark Party Mix",
+   "devices": [],
+   "scripts": [
+    "midi-components-0.0.js",
+    "Numark-Party-Mix.scripts.js"
+   ]
+  },
+  {
+   "file": "Numark-Scratch.midi.xml",
+   "name": "Numark Scratch",
+   "author": "Al Hadebe(NotYourAverageAl)",
+   "description": "Mapping for the Numark Scratch Mixer",
+   "forums": "https://mixxx.discourse.group/t/numark-scratch-mapping/25186",
+   "manual": "https://manual.mixxx.org/latest/en/hardware/controllers/numark_scratch",
+   "controllerId": "Numark-Scratch",
+   "devices": [],
+   "scripts": [
+    "lodash.mixxx.js",
+    "midi-components-0.0.js",
+    "Numark-Scratch-scripts.js"
+   ]
+  },
+  {
+   "file": "Numark Total Control.midi.xml",
+   "name": "Numark Total Control",
+   "author": "Smashuu / David Gnedt",
+   "description": "Optimized for Traktor label card",
+   "forums": "http://www.mixxx.org/forums/viewtopic.php?f=7&amp;t=1252",
+   "manual": "numark_total_control",
+   "controllerId": "TotalTrack Control",
+   "devices": [],
+   "scripts": [
+    "Numark-Total-Control-scripts.js"
+   ]
+  },
+  {
+   "file": "Numark V7.midi.xml",
+   "name": "Numark V7",
+   "author": "Mike Bucceroni",
+   "description": "",
+   "forums": "http://www.mixxx.org/forums/viewtopic.php?f=7&amp;t=3974",
+   "manual": "numark_v7",
+   "controllerId": "Numark V7",
+   "devices": [],
+   "scripts": [
+    "Numark-V7-scripts.js"
+   ]
+  },
+  {
+   "file": "Pioneer CDJ-2000.midi.xml",
+   "name": "Pioneer CDJ-2000",
+   "author": "Ilkka Tuohela <hile@iki.fi>",
+   "description": "Pioneer CDJ-2000 configuration for 2 decks on midi channels 1 and 2",
+   "forums": "",
+   "manual": "pioneer_cdj_2000",
+   "controllerId": "PIONEER CDJ-2000",
+   "devices": [],
+   "scripts": [
+    "Pioneer-CDJ-2000-scripts.js"
+   ]
+  },
+  {
+   "file": "Pioneer CDJ-350 Ch1.midi.xml",
+   "name": "Pioneer CDJ-350 CH1",
+   "author": "Kazuaki and DJ Tiger",
+   "description": "This is an incomplete mapping for a single Pioneer CDJ 350, for the Channel1 (Deck1).",
+   "forums": "http://www.mixxx.org/forums/viewtopic.php?f=7&amp;t=1917",
+   "manual": "pioneer_cdj_350",
+   "controllerId": "USB Audio Device",
+   "devices": [],
+   "scripts": [
+    "Pioneer-CDJ-350-scripts.js"
+   ]
+  },
+  {
+   "file": "Pioneer CDJ-350 Ch2.midi.xml",
+   "name": "Pioneer CDJ-350 CH2",
+   "author": "Kazuaki and DJ Tiger",
+   "description": "This is an incomplete mapping for a single Pioneer CDJ 350, for the Channel2 (Deck2)",
+   "forums": "http://www.mixxx.org/forums/viewtopic.php?f=7&amp;t=1917",
+   "manual": "pioneer_cdj_350",
+   "controllerId": "USB Audio Device (2)",
+   "devices": [],
+   "scripts": [
+    "Pioneer-CDJ-350-scripts.js"
+   ]
+  },
+  {
+   "file": "Pioneer CDJ-850.midi.xml",
+   "name": "Pioneer CDJ-850",
+   "author": "Ilkka Tuohela <hile@iki.fi>",
+   "description": "Pioneer CDJ-850 configuration for 2 decks on midi channels 1 and 2",
+   "forums": "",
+   "manual": "pioneer_cdj_850",
+   "controllerId": "PIONEER CDJ-850",
+   "devices": [],
+   "scripts": [
+    "Pioneer-CDJ-850-scripts.js"
+   ]
+  },
+  {
+   "file": "Pioneer DDJ-200.midi.xml",
+   "name": "Pioneer DDJ-200",
+   "author": "Dan Giddins, Frank.Breitling at gmx.de",
+   "description": "2-deck USB and Bluetooth MIDI controller with support for 4-deck mode.",
+   "forums": "",
+   "manual": "pioneer_ddj_200",
+   "controllerId": "DDJ-200",
+   "devices": [],
+   "scripts": [
+    "Pioneer-DDJ-200-scripts.js"
+   ]
+  },
+  {
+   "file": "Pioneer-DDJ-400.midi.xml",
+   "name": "Pioneer DDJ-400",
+   "author": "Warker, nschloe, dj3730, jusko, tiesjan",
+   "description": "Midi Mapping for the Pioneer DDJ-400",
+   "forums": "https://mixxx.discourse.group/t/pioneer-ddj-400/17476",
+   "manual": "pioneer_ddj_400",
+   "controllerId": "DDJ-400",
+   "devices": [],
+   "scripts": [
+    "Pioneer-DDJ-400-script.js"
+   ]
+  },
+  {
+   "file": "Pioneer-DDJ-FLX4.midi.xml",
+   "name": "Pioneer DDJ-FLX4",
+   "author": "Robert904",
+   "description": "Controller Midi Mapping for the Pioneer DDJ-FLX4 (based on DDJ-400 mapping)",
+   "forums": "https://mixxx.discourse.group/t/pioneer-ddj-flx4",
+   "manual": "pioneer_ddj_FLX4",
+   "controllerId": "DDJ-FLX4",
+   "devices": [],
+   "scripts": [
+    "Pioneer-DDJ-FLX4-script.js"
+   ]
+  },
+  {
+   "file": "Pioneer-DDJ-SB.midi.xml",
+   "name": "Pioneer DDJ-SB",
+   "author": "Joan Ardiaca Jové",
+   "description": "Pioneer DDJ-SB configuration for 4 decks. Use the tempo range buttons to switch decks.",
+   "forums": "",
+   "manual": "pioneer_ddj_sb",
+   "controllerId": "PIONEER",
+   "devices": [],
+   "scripts": [
+    "Pioneer-DDJ-SB-scripts.js"
+   ]
+  },
+  {
+   "file": "Pioneer-DDJ-SB2.midi.xml",
+   "name": "Pioneer DDJ-SB2",
+   "author": "Be, Michael Stahl (DG3NEC)",
+   "description": "Pioneer DDJ-SB2",
+   "forums": "https://mixxx.discourse.group/t/pinoneer-ddj-sb2-midi-mapping/15373",
+   "manual": "pioneer_ddj_sb2",
+   "controllerId": "DDJ-SB2",
+   "devices": [],
+   "scripts": [
+    "lodash.mixxx.js",
+    "midi-components-0.0.js",
+    "Pioneer-DDJ-SB2-scripts.js"
+   ]
+  },
+  {
+   "file": "Pioneer-DDJ-SB3.midi.xml",
+   "name": "Pioneer DDJ-SB3",
+   "author": "Dancephy.com",
+   "description": "Mapping file for the Pioneer DDJ-SB3 controller. Version 1.1.0.",
+   "forums": "https://mixxx.discourse.group/t/pioneer-ddj-sb3-mapping-v1-0-now-available/22186",
+   "manual": "pioneer_ddj_sb3",
+   "controllerId": "",
+   "devices": [],
+   "scripts": [
+    "lodash.mixxx.js",
+    "midi-components-0.0.js",
+    "Pioneer-DDJ-SB3-scripts.js"
+   ]
+  },
+  {
+   "file": "Pioneer DDJ-SX.midi.xml",
+   "name": "Pioneer DDJ-SX",
+   "author": "Maximilian Beiersdorfer, DJMaxergy",
+   "description": "Pioneer DDJ-SX controller mapping",
+   "forums": "https://mixxx.discourse.group/t/pioneer-ddj-sx-controller-mapping/15954",
+   "manual": "pioneer_ddj_sx",
+   "controllerId": "DDJ-SX",
+   "devices": [],
+   "scripts": [
+    "lodash.mixxx.js",
+    "midi-components-0.0.js",
+    "Pioneer-DDJ-SX-scripts.js"
+   ]
+  },
+  {
+   "file": "Reloop-Beatmix-2-4-MK2.midi.xml",
+   "name": "Reloop Beatmix 2/4 MK2",
+   "author": "Sébastien Blaisot <sebastien@blaisot.org>",
+   "description": "Controller mapping for the Reloop Beatmix 2/4 MK2.",
+   "forums": "https://mixxx.discourse.group/t/reloop-beatmix-2-4-mapping/16049",
+   "manual": "reloop_beatmix_2",
+   "controllerId": "Reloop Beatmix 2/4 MK2",
+   "devices": [],
+   "scripts": [
+    "Reloop-Beatmix-2-4-MK2-scripts.js"
+   ]
+  },
+  {
+   "file": "Reloop Beatpad.midi.xml",
+   "name": "Reloop Beatpad",
+   "author": "Chloé Avrillon (DJ Chloé)",
+   "description": "Controller mapping for the Reloop Beatpad. Have fun !!!",
+   "forums": "http://www.mixxx.org/forums/viewtopic.php?f=7&amp;t=7581",
+   "manual": "reloop_beatpad",
+   "controllerId": "Reloop",
+   "devices": [],
+   "scripts": [
+    "Reloop-Beatpad-scripts.js"
+   ]
+  },
+  {
+   "file": "Reloop Digital Jockey 2 Controller Edition.midi.xml",
+   "name": "Reloop Digital Jockey 2 Controller",
+   "author": "Tobias Rafreider and Sandor Ivicsics",
+   "description": "This is a complete mapping for a Reloop Digital Jockey 2 Controller Edition or Reloop Digital Jockey 2 Interface Editiion",
+   "forums": "http://www.mixxx.org/forums/viewtopic.php?f=7&amp;t=1226",
+   "manual": "reloop_digital_jockey_2_controller_edition",
+   "controllerId": "DIGITAL JOCKEY",
+   "devices": [],
+   "scripts": [
+    "Reloop-Digital-Jockey2-Controller-scripts.js"
+   ]
+  },
+  {
+   "file": "Reloop-Digital-Jockey-2-IE.midi.xml",
+   "name": "Reloop Digital Jockey 2 Interface Edition",
+   "author": "DJ aK",
+   "description": "Controller mapping for Reloop Digital Jockey 2 Interface Edition",
+   "forums": "https://mixxx.discourse.group/t/reloop-digital-jockey-2-mapping-by-dj-ak/23971",
+   "manual": "reloop_digital_jockey_2_interface_edition",
+   "controllerId": "DIGITALJOCKEY2",
+   "devices": [],
+   "scripts": [
+    "lodash.mixxx.js",
+    "midi-components-0.0.js",
+    "Reloop-Digital-Jockey-2-IE.scripts.js"
+   ]
+  },
+  {
+   "file": "Reloop Jockey 3 ME.midi.xml",
+   "name": "Reloop Jockey 3 ME",
+   "author": "Chris2000SP",
+   "description": "v1.0.3 Mapping for 2.0.x",
+   "forums": "https://mixxx.discourse.group/t/create-a-mapping-for-reloop-jockey-3-me/13703",
+   "manual": "reloop_jockey_3_master_edition",
+   "controllerId": "Reloop",
+   "devices": [],
+   "scripts": [
+    "Reloop-Jockey-3-ME-scripts.js"
+   ]
+  },
+  {
+   "file": "Reloop-Mixage.midi.xml",
+   "name": "Reloop Mixage",
+   "author": "HorstBaerbel & gqzomer",
+   "description": "Mapping for the Reloop Mixage Interface Edition MK1, Interface Edition MK2 and Controller Edition.",
+   "forums": "https://mixxx.discourse.group/t/reloop-mixage-mapping/14779",
+   "manual": "reloop_mixage",
+   "controllerId": "Reloop Mixage",
+   "devices": [],
+   "scripts": [
+    "Reloop-Mixage.scripts.js"
+   ]
+  },
+  {
+   "file": "Reloop Terminal Mix 2-4.midi.xml",
+   "name": "Reloop Terminal Mix 2/4",
+   "author": "Sean M. Pappalardo (1.11), ronso0 (2.1 update)",
+   "description": "A complete 4-deck preset for a single Reloop Terminal Mix 2 or 4.",
+   "forums": "",
+   "manual": "reloop_terminal_mix_series",
+   "controllerId": "TerminalMix",
+   "devices": [],
+   "scripts": [
+    "lodash.mixxx.js",
+    "midi-components-0.0.js",
+    "Reloop Terminal Mix 2-4.js"
+   ]
+  },
+  {
+   "file": "Roland_DJ-505.midi.xml",
+   "name": "Roland DJ-505",
+   "author": "Jan Holthuis",
+   "description": "4-deck mapping for Roland DJ-505 controller",
+   "forums": "https://mixxx.discourse.group/t/roland-dj-505/17916",
+   "manual": "roland_dj_505",
+   "controllerId": "DJ-505",
+   "devices": [],
+   "scripts": [
+    "lodash.mixxx.js",
+    "midi-components-0.0.js",
+    "Roland_DJ-505-scripts.js"
+   ]
+  },
+  {
+   "file": "Soundless_joyMIDI.midi.xml",
+   "name": "Soundless joyMIDI",
+   "author": "Ozzy Chiu",
+   "description": "Soundless Portable MIDI Controller",
+   "forums": "https://www.mixxx.org/forums/viewtopic.php?f=7&amp;t=13166",
+   "manual": "soundless_studio_joymidi",
+   "controllerId": "Soundless",
+   "devices": [],
+   "scripts": [
+    "Soundless_joyMIDI_scripts.js"
+   ]
+  },
+  {
+   "file": "Stanton-DJC-4.midi.xml",
+   "name": "Stanton DJC.4",
+   "author": "Martin Bruset Solberg, Christoph Zimmermann",
+   "description": "The Stanton DJC.4 is a 4 deck controller with large, touch-sensitive jog wheels and a built-in audio interface (2 inputs, 2 outputs). It features 4 FX units and a master VU meter.",
+   "forums": "",
+   "manual": "stanton_djc_4",
+   "controllerId": "DJC-4",
+   "devices": [],
+   "scripts": [
+    "lodash.mixxx.js",
+    "midi-components-0.0.js",
+    "Stanton-DJC-4-scripts.js"
+   ]
+  },
+  {
+   "file": "Stanton SCS.1d.midi.xml",
+   "name": "Stanton SCS.1d (unfinished)",
+   "author": "Sean M. Pappalardo",
+   "description": "This is a work-in-progress preset for a single Stanton SCS.1d turntable controller. Requires scripting and native HSS1394 support on OSX and Windows, or ALSA's HSS1394 MIDI driver on Linux (in the ALSA tree as of 12 November 2012.)",
+   "forums": "",
+   "manual": "stanton_scs1d",
+   "controllerId": "Stanton SCS.1d",
+   "devices": [],
+   "scripts": [
+    "Stanton-SCS1d-scripts.js"
+   ]
+  },
+  {
+   "file": "Stanton SCS.1m.midi.xml",
+   "name": "Stanton SCS.1m",
+   "author": "Sean M. Pappalardo",
+   "description": "This is a complete mapping for a single Stanton SCS.1m mixer controller. Requires scripting.",
+   "forums": "",
+   "manual": "stanton_scs1m",
+   "controllerId": "Stanton SCS.1m",
+   "devices": [],
+   "scripts": [
+    "Stanton-SCS1m-scripts.js"
+   ]
+  },
+  {
+   "file": "Stanton SCS.3d.midi.xml",
+   "name": "Stanton SCS.3d",
+   "author": "Sean M. Pappalardo",
+   "description": "This is a preset for a single Stanton SCS.3d touch controller controlling four virtual decks.",
+   "forums": "",
+   "manual": "",
+   "controllerId": "Stanton SCS.3d",
+   "devices": [],
+   "scripts": [
+    "Stanton-SCS3d-scripts.js"
+   ]
+  },
+  {
+   "file": "Stanton SCS.3d Alternate.midi.xml",
+   "name": "Stanton SCS.3d (alternate)",
+   "author": "sbalmer",
+   "description": "Alternate mapping for the Stanton SCS.3d controller with somewhat different controls and additional lights.",
+   "forums": "",
+   "manual": "stanton_scs3d",
+   "controllerId": "SCS.3d",
+   "devices": [],
+   "scripts": [
+    "Stanton-SCS3d-alternate-scripts.js"
+   ]
+  },
+  {
+   "file": "Stanton SCS.3m.midi.xml",
+   "name": "Stanton SCS.3m",
+   "author": "sbalmer",
+   "description": "Mapping for the Stanton SCS.3m controller. Supports four decks.",
+   "forums": "",
+   "manual": "stanton_scs3m",
+   "controllerId": "SCS.3m",
+   "devices": [],
+   "scripts": [
+    "Stanton-SCS3m-scripts.js"
+   ]
+  },
+  {
+   "file": "us428.midi.xml",
+   "name": "Tascam US-428",
+   "author": "Auto-converted by madjesta's PHP script",
+   "description": "Automatic conversion of the file us428.midi.xml for Mixxx 1.6.2",
+   "forums": "",
+   "manual": "tascam_us_428",
+   "controllerId": "us428",
+   "devices": [],
+   "scripts": []
+  },
+  {
+   "file": "TrakProDJ iPad.midi.xml",
+   "name": "TrakProDJ iPad",
+   "author": "Ilkka Tuohela <hile@iki.fi>",
+   "description": "TrakProDJ iPad application midi mapping",
+   "forums": "",
+   "manual": "trakprodj",
+   "controllerId": "Network",
+   "devices": [],
+   "scripts": [
+    "TrakProDJ-iPad-scripts.js"
+   ]
+  },
+  {
+   "file": "Vestax Spin.midi.xml",
+   "name": "Vestax Spin",
+   "author": "Bill Good, based on the work of Anders Gunnarsson",
+   "description": "Bill's controller mapping for Vestax Spin + script",
+   "forums": "",
+   "manual": "vestax_spin",
+   "controllerId": "Vestax Spin",
+   "devices": [],
+   "scripts": [
+    "Vestax-Spin-scripts.js"
+   ]
+  },
+  {
+   "file": "Vestax Typhoon.midi.xml",
+   "name": "Vestax Typhoon",
+   "author": "bestdani",
+   "description": "bestdani's controller capping for Vestax Typhoon in Mixxx 2.0+ and script. The controller reacts as described on the console. Some elements are taken from Bill Good's original mapping.",
+   "forums": "https://mixxx.discourse.group/t/vestax-typhoon-mapping-for-mixxx-2-0/12551/1#p14494",
+   "manual": "vestax_typhoon",
+   "controllerId": "Vestax Typhoon",
+   "devices": [],
+   "scripts": [
+    "Vestax-Typhoon-scripts.js"
+   ]
+  },
+  {
+   "file": "Vestax Typhoon Enhanced.midi.xml",
+   "name": "Vestax Typhoon Enhanced",
+   "author": "bestdani",
+   "description": "bestdani's customized controller mapping for Vestax Typhoon in Mixxx 2.0+ and script. The controller actions differ from the description on the console. Therefore it enables more controls such as hotcues, relative pitch movements, slip mode and much more. Some elements are taken from Bill Good's ori",
+   "forums": "https://mixxx.discourse.group/t/vestax-typhoon-mapping-for-mixxx-2-0/12551/1#p14494",
+   "manual": "vestax_typhoon",
+   "controllerId": "Vestax Typhoon",
+   "devices": [],
+   "scripts": [
+    "Vestax-Typhoon-scripts.js"
+   ]
+  },
+  {
+   "file": "Vestax VCI-100.midi.xml",
+   "name": "Vestax VCI-100",
+   "author": "Anders Gunnarsson",
+   "description": "Preliminary controller mapping for Vestax VCI-100 with scripts",
+   "forums": "",
+   "manual": "vestax_vci_100mki",
+   "controllerId": "Vestax VCI-100",
+   "devices": [],
+   "scripts": [
+    "Vestax-VCI-100-scripts.js"
+   ]
+  },
+  {
+   "file": "Vestax VCI-100-3DEX.midi.xml",
+   "name": "Vestax VCI-100 (MixVibes 3DEX Editon)",
+   "author": "Julius Alexander Kohout edler von Dolnobransky",
+   "description": "Preliminary controller mapping for Vestax VCI-100 with scripts",
+   "forums": "",
+   "manual": "vestax_vci_100_mixvibes_3dex_edition",
+   "controllerId": "Vestax VCI-100-3DEX ",
+   "devices": [],
+   "scripts": [
+    "Vestax-VCI-100-3DEX-scripts.js"
+   ]
+  },
+  {
+   "file": "Vestax VCI-100-hile.midi.xml",
+   "name": "Vestax VCI-100 Hile Mod",
+   "author": "Ilkka Tuohela",
+   "description": "Modified Mapping for Vestax VCI-100",
+   "forums": "",
+   "manual": "vestax_vci_100mki",
+   "controllerId": "Vestax VCI-100 Hile Variant",
+   "devices": [],
+   "scripts": [
+    "Vestax-VCI-100-hile.js"
+   ]
+  },
+  {
+   "file": "Vestax VCI-100MKII.midi.xml",
+   "name": "Vestax VCI-100MKII",
+   "author": "Takeshi Soejima",
+   "description": "2018-4-15",
+   "forums": "",
+   "manual": "vestax_vci_100mkii",
+   "controllerId": "VCI-100MKII",
+   "devices": [],
+   "scripts": [
+    "Vestax-VCI-100MKII-scripts.js"
+   ]
+  },
+  {
+   "file": "Vestax VCI-300.midi.xml",
+   "name": "Vestax VCI-300",
+   "author": "Uwe Klotz",
+   "description": "",
+   "forums": "http://www.mixxx.org/forums/viewtopic.php?f=7&amp;t=4021",
+   "manual": "vestax_vci_300",
+   "controllerId": "Vestax VCI-300",
+   "devices": [],
+   "scripts": [
+    "Vestax-VCI-300-scripts.js"
+   ]
+  },
+  {
+   "file": "Vestax VCI-400.midi.xml",
+   "name": "Vestax VCI-400",
+   "author": "Owen Williams, Tobias Rafreider",
+   "description": "Controller mapping for Vestax VCI-400",
+   "forums": "",
+   "manual": "vestax_vci_400",
+   "controllerId": "Vestax",
+   "devices": [],
+   "scripts": [
+    "Vestax-VCI-400-scripts.js"
+   ]
+  },
+  {
+   "file": "Wireless DJ App.midi.xml",
+   "name": "Wireless DJ App",
+   "author": "Evgen Bodunov / Ilya Birman",
+   "description": "iPad wireless midi controller application (http://wirelessdjapp.com)",
+   "forums": "http://www.mixxx.org/forums/viewtopic.php?f=7&amp;t=2767",
+   "manual": "",
+   "controllerId": "Network Wireless DJ",
+   "devices": [],
+   "scripts": [
+    "Wireless-DJ-scripts.js"
+   ]
+  },
+  {
+   "file": "Yaeltex MiniMixxx.midi.xml",
+   "name": "Yaeltex MiniMixxx",
+   "author": "Owen Williams",
+   "description": "A compact DJ controller specifically designed for Mixxx.",
+   "forums": "",
+   "manual": "",
+   "controllerId": "MiniMixxx",
+   "devices": [],
+   "scripts": [
+    "Yaeltex-MiniMixxx-scripts.js"
+   ]
+  }
+ ]
+}

@@ -1,0 +1,8 @@
+node_modules/
+# generated demo loops (npm run testtracks)
+test-tracks/*.wav
+# built launcher (attach to a GitHub release instead)
+*.exe
+*.log
+.DS_Store
+Thumbs.db

@@ -1,0 +1,11 @@
+{
+  "name": "pulsar-dj",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Eigene 4-Deck-DJ-Software für den Pioneer DDJ-SX (Web Audio + Web MIDI)",
+  "type": "module",
+  "scripts": {
+    "start": "node server.mjs",
+    "testtracks": "node tools/make-test-tracks.mjs"
+  }
+}

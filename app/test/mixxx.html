@@ -1,0 +1,266 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mixxx mapping test</title>
+<!-- Loads every Mixxx mapping from controllers/mixxx/index.json against a fake
+     Pulsar app and a fake MIDI output: init, synthetic input, ticks, shutdown.
+     SPDX-License-Identifier: GPL-3.0-or-later -->
+<style>
+  :root { --bg: #111318; --fg: #e6e8ee; --dim: #8a90a0; --ok: #3ddc84; --warn: #ffb020; --bad: #ff4d6a; --line: #262a33; }
+  body { background: var(--bg); color: var(--fg); font: 13px/1.4 system-ui, sans-serif; margin: 0; padding: 16px; }
+  h1 { font-size: 18px; margin: 0 0 8px; }
+  #summary { margin: 8px 0 16px; font-size: 15px; }
+  table { border-collapse: collapse; width: 100%; }
+  td, th { border-bottom: 1px solid var(--line); padding: 4px 6px; text-align: left; vertical-align: top; }
+  th { color: var(--dim); font-weight: 500; }
+  .OK { color: var(--ok); } .WARN { color: var(--warn); } .FAIL { color: var(--bad); }
+  .err { color: var(--dim); font-family: ui-monospace, monospace; font-size: 12px; white-space: pre-wrap; word-break: break-word; }
+  input { background: #1b1e25; color: var(--fg); border: 1px solid var(--line); padding: 4px 6px; }
+</style>
+</head>
+<body>
+<h1>Mixxx mapping test</h1>
+<div>Filter: <input id="filter" placeholder="part of file name"> <button id="run">Run</button></div>
+<div id="summary">Loading…</div>
+<table><thead><tr><th>Result</th><th>Mapping</th><th>Controls</th><th>Sent</th><th>Errors / warnings</th><th>First errors</th></tr></thead><tbody id="rows"></tbody></table>
+<script type="module">
+import { loadMappingIndex, MixxxController } from '../js/mixxx/index.js';
+import { Deck } from '../js/deck.js';
+import { Engine } from '../js/engine.js';
+
+let realAct = null;
+try { realAct = (await import('../js/app.js')).App.prototype.act; } catch (e) { console.warn('app.js not importable, using minimal act()', e); }
+
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+
+function fakeApp() {
+  const app = {
+    settings: { fourDecks: false, autoGain: true, hotcueGate: true, loadLock: true, invertTempo: false, jogSensitivity: 1, brake: 0 },
+    masterIndex: null, padMode: ['hotcue', 'hotcue', 'hotcue', 'hotcue'], focus: [0, 1], selected: { id: 1, title: 'Test' },
+    started: true, ui: { moveSelection() {}, toggleBrowseFocus() {}, dirty() {}, selected: { id: 1 }, layout() {}, toast() {} },
+    library: { markPlayed() {}, saveCues() {}, available: () => true, updateGrid() {} },
+    loads: 0,
+    toast() {},
+    async loadTrack() { app.loads++; },
+    onDeckEnded() {},
+    focusDeck() {},
+    editGrid() {},
+  };
+  app.engine = new Engine();
+  app.engine.rewireFx = () => {};
+  app.decks = [0, 1, 2, 3].map((i) => {
+    const d = new Deck(app, i);
+    d.node = { port: { postMessage() {} } };
+    d.ctx = { get currentTime() { return performance.now() / 1000; } };
+    if (i < 2) {
+      d.loaded = true; d.duration = 180; d.sr = 44100; d.info = { bpm: 128, beatOffset: 0.1 };
+      d.track = { title: 'Track ' + i, artist: 'Artist' };
+    }
+    return d;
+  });
+  app.masterFor = (deck) => app.decks.find((d) => d !== deck && d.loaded) || null;
+  app.act = realAct ? realAct.bind(app) : function (name, t, a) {
+    const d = app.decks[t];
+    if (name === 'play') d.togglePlay();
+    else if (name === 'cueDown') d.cueDown();
+    else if (name === 'cueUp') d.cueUp();
+  };
+  return app;
+}
+
+function fakeOut() {
+  return { name: 'fake', count: 0, sysex: 0, send(data) { if (data[0] === 0xf0) this.sysex++; this.count++; } };
+}
+
+// synthetic input: every mapped status/midino gets a press/release or a few CC values
+function messagesFor(ctl) {
+  const msgs = [];
+  for (const k of ctl.controls.keys()) {
+    const status = k >> 8, no = k & 0xff, t = status & 0xf0;
+    if (t === 0x90) msgs.push([status, no, 0x7f], [status, no, 0x00]);
+    else if (t === 0x80) msgs.push([status, no, 0x40]);
+    else if (t === 0xb0) msgs.push([status, no, 0x41], [status, no, 0x3f], [status, no, 0x7f], [status, no, 0x00], [status, no, 0x40]);
+    else if (t === 0xe0) msgs.push([status, 0x00, 0x40], [status, 0x7f, 0x7f]);
+    else if (t === 0xc0) msgs.push([status, no]);
+    else msgs.push([status, no, 0x40]);
+  }
+  return msgs;
+}
+
+async function testOne(entry) {
+  const app = fakeApp(), out = fakeOut();
+  const ctl = new MixxxController(app, entry, out, { sysex: true });
+  const res = { file: entry.file, name: entry.name, controls: 0, sent: 0, phases: {} };
+  await ctl.start();
+  res.controls = ctl.mapping?.controls.length || 0;
+  res.phases.init = ctl.errorCount;
+  if (ctl.state === 'running') {
+    await sleep(30);
+    for (const m of messagesFor(ctl)) ctl.handleMidi(Uint8Array.from(m));
+    ctl.handleMidi(Uint8Array.from([0xf0, 0x00, 0x20, 0x7f, 0xf7]));
+    await sleep(0);
+    res.phases.input = ctl.errorCount - res.phases.init;
+    for (let i = 0; i < 8; i++) { ctl.tick(); await sleep(20); }
+    res.phases.tick = ctl.errorCount - res.phases.init - res.phases.input;
+  }
+  const before = ctl.errorCount;
+  ctl.stop();
+  res.phases.shutdown = ctl.errorCount - before;
+  res.state = ctl.state;
+  res.sent = out.count;
+  res.errors = ctl.errorCount;
+  res.warnings = ctl.warnings || 0;
+  res.stacks = ctl.errors.slice(0, 3).map((e) => e.stack);
+  res.log = ctl.logLines.slice(-10);
+  res.errorList = ctl.errors.slice(0, 4).map((e) => `${e.where}: ${e.message}`);
+  res.result = res.phases.init ? 'FAIL' : res.errors ? 'WARN' : 'OK';
+  if (ctl.errors.some((e) => e.where === 'start')) res.result = 'FAIL';
+  return res;
+}
+
+const rows = document.getElementById('rows'), summary = document.getElementById('summary');
+
+async function run() {
+  const filter = document.getElementById('filter').value.trim().toLowerCase();
+  rows.textContent = '';
+  const index = await loadMappingIndex();
+  const list = index.filter((e) => !filter || e.file.toLowerCase().includes(filter));
+  const results = [];
+  window.results = results;
+  window.done = false;
+  for (const [i, entry] of list.entries()) {
+    summary.textContent = `Running ${i + 1}/${list.length}: ${entry.file}`;
+    let r;
+    try { r = await testOne(entry); } catch (e) { r = { file: entry.file, name: entry.name, result: 'FAIL', errors: 1, errorList: ['harness: ' + e.message], controls: 0, sent: 0 }; }
+    results.push(r);
+    const tr = document.createElement('tr');
+    const td = (t, cls) => { const c = document.createElement('td'); c.textContent = t; if (cls) c.className = cls; tr.appendChild(c); };
+    td(r.result, r.result);
+    td(`${r.name}\n${r.file}`);
+    td(r.controls);
+    td(r.sent);
+    td(r.phases ? `${r.errors} / ${r.warnings} (init ${r.phases.init ?? '-'}, input ${r.phases.input ?? '-'}, tick ${r.phases.tick ?? '-'}, shutdown ${r.phases.shutdown ?? '-'})` : r.errors);
+    td((r.errorList || []).join('\n'), 'err');
+    rows.appendChild(tr);
+  }
+  const n = (k) => results.filter((r) => r.result === k).length;
+  const checks = await functional();
+  window.checks = checks;
+  const failed = checks.filter((c) => !c.ok);
+  summary.innerHTML = `<b class="OK">${n('OK')} OK</b> · <b class="WARN">${n('WARN')} with runtime errors</b> · <b class="FAIL">${n('FAIL')} failed init</b> · ${results.length} mappings`
+    + `<br>Functional checks: <b class="${failed.length ? 'FAIL' : 'OK'}">${checks.length - failed.length}/${checks.length} passed</b>`
+    + (failed.length ? ' — failed: ' + failed.map((c) => c.name).join(', ') : '');
+  window.done = true;
+}
+
+// end-to-end checks of the bridge and the runtime against Pulsar state
+async function functional() {
+  const checks = [];
+  const check = (name, ok, info = '') => checks.push({ name, ok: !!ok, info });
+  const near = (a, b, e = 1e-3) => Math.abs(a - b) < e;
+  const index = await loadMappingIndex();
+  const app = fakeApp();
+  const sent = [];
+  const out = { name: 'fake', send(d) { sent.push([...d]); } };
+  const ctl = new MixxxController(app, index.find((e) => e.file === 'Pioneer-DDJ-400.midi.xml'), out, { sysex: false });
+  await ctl.start();
+  const d = app.decks[0], b = ctl.bridge, eng = ctl.win.engine;
+  check('DDJ-400 runs', ctl.state === 'running' && !ctl.errorCount, ctl.errors[0]?.message);
+  // XML <control> play (Normal option on a toggle control)
+  ctl.handleMidi([0x90, 0x0b, 0x7f]); ctl.handleMidi([0x90, 0x0b, 0x00]);
+  check('XML play toggles deck', d.playing);
+  await sleep(0);
+  let fired = 0;
+  const conn = eng.makeConnection('[Channel1]', 'play_indicator', () => fired++);
+  sent.length = 0;
+  ctl.handleMidi([0x90, 0x0b, 0x7f]); ctl.handleMidi([0x90, 0x0b, 0x00]);
+  ctl.tick();
+  check('XML play toggles back', !d.playing);
+  check('makeConnection fires on change', fired === 1, 'fired ' + fired);
+  check('XML <output> play LED sent', sent.some((m) => m[0] === 0x90 && m[1] === 0x0b && m[2] === 0x00), JSON.stringify(sent.slice(0, 6)));
+  conn.disconnect();
+  check('connection disconnect', !conn.isConnected);
+  // 14-bit fader: MSB 0x40 + LSB 0 -> 0.5
+  ctl.handleMidi([0xb0, 0x13, 0x40]); ctl.handleMidi([0xb0, 0x33, 0x00]);
+  check('14-bit volume', near(d.mix.volume, 0.5), d.mix.volume);
+  // normalisation
+  eng.setParameter('[EqualizerRack1_[Channel1]_Effect1]', 'parameter1', 0.25);
+  check('EQ low param -> mix.low', near(d.mix.low, 0.25), d.mix.low);
+  eng.setValue('[EqualizerRack1_[Channel1]_Effect1]', 'parameter3', 1);
+  check('EQ high value 1 = unity', near(d.mix.high, 0.5), d.mix.high);
+  eng.setValue('[Channel1]', 'pregain', 4);
+  check('pregain 4 = +12 dB', near(d.mix.trim, 1, 0.01), d.mix.trim);
+  check('pregain param', near(eng.getParameter('[Channel1]', 'pregain'), 1, 0.01));
+  eng.setValue('[QuickEffectRack1_[Channel1]]', 'super1', 0.2);
+  check('quick effect super1 -> filter', near(d.mix.filter, 0.2), d.mix.filter);
+  eng.setValue('[Master]', 'crossfader', -1);
+  check('crossfader -1 -> 0', near(app.engine.xfader, 0), app.engine.xfader);
+  eng.setValue('[Master]', 'headMix', 1);
+  check('headMix 1 -> master', near(app.engine.headMix, 1), app.engine.headMix);
+  eng.setValue('[Channel1]', 'rate', 0.5);
+  check('rate 0.5 -> pitch', near(d.pitch, 0.5 * d.range), d.pitch);
+  check('rate read back', near(eng.getValue('[Channel1]', 'rate'), 0.5));
+  eng.setValue('[Channel1]', 'hotcue_1_activate', 1); eng.setValue('[Channel1]', 'hotcue_1_activate', 0);
+  check('hotcue_1_activate sets cue', d.hotcues[0] != null && eng.getValue('[Channel1]', 'hotcue_1_enabled') === 1);
+  eng.setValue('[Channel1]', 'beatloop_4_activate', 1);
+  check('beatloop_4_activate', d.loop.on && near(d.loop.beats, 4) && eng.getValue('[Channel1]', 'beatloop_4_enabled') === 1);
+  eng.setValue('[Channel1]', 'loop_halve', 1);
+  check('loop_halve', near(d.loop.beats, 2), d.loop.beats);
+  eng.setValue('[Channel1]', 'reloop_toggle', 1);
+  check('reloop_toggle exits', !d.loop.on);
+  eng.setValue('[Channel1]', 'keylock', 0);
+  check('keylock off', !d.keylock);
+  eng.setValue('[Channel1]', 'pfl', 1);
+  check('pfl on', d.mix.cue);
+  eng.setValue('[Channel1]', 'orientation', 0);
+  check('orientation left', d.mix.xfAssign === 'A');
+  eng.setValue('[EffectRack1_EffectUnit1]', 'group_[Channel1]_enable', 1);
+  check('fx unit assign', app.engine.fxUnits[0].assigned[0]);
+  eng.setValue('[EffectRack1_EffectUnit1_Effect2]', 'enabled', 1);
+  eng.setParameter('[EffectRack1_EffectUnit1_Effect2]', 'meta', 0.75);
+  check('fx slot enable + meta', app.engine.fxUnits[0].slots[1].on && near(app.engine.fxUnits[0].slots[1].level, 0.75));
+  eng.setValue('[Channel1]', 'unknown_control_xyz', 3);
+  check('unknown controls stored', eng.getValue('[Channel1]', 'unknown_control_xyz') === 3);
+  // soft takeover: far value ignored, crossing value accepted
+  eng.setValue('[Channel1]', 'volume', 0.2);
+  eng.softTakeover('[Channel1]', 'volume', true);
+  eng.setValue('[Channel1]', 'volume', 0.85);
+  b.setValue('[Channel1]', 'volume', 0.2);            // moved elsewhere (UI)
+  eng.setValue('[Channel1]', 'volume', 0.8);
+  check('soft takeover ignores far value', near(d.mix.volume, 0.2), d.mix.volume);
+  eng.setValue('[Channel1]', 'volume', 0.1);
+  check('soft takeover picks up after crossing', near(d.mix.volume, 0.1), d.mix.volume);
+  // scratching
+  eng.scratchEnable(1, 128, 33 + 1 / 3, 1 / 8, 1 / 256);
+  check('isScratching', eng.isScratching(1) && d.jogTouched);
+  eng.scratchTick(1, 5);
+  eng.scratchDisable(1);
+  check('scratchDisable', !eng.isScratching(1) && !d.jogTouched);
+  // timers
+  let ticks = 0;
+  const id = eng.beginTimer(20, () => ticks++);
+  await sleep(110);
+  eng.stopTimer(id);
+  check('beginTimer repeats', ticks >= 3, ticks);
+  let once = 0;
+  eng.beginTimer(10, () => once++, true);
+  await sleep(50);
+  check('one-shot timer', once === 1);
+  // sysex dropped without permission
+  const dropped = ctl.droppedSysex;
+  ctl.win.midi.sendSysexMsg([0xf0, 0x7e, 0x00, 0xf7], 4);
+  check('sysex dropped without access', ctl.droppedSysex === dropped + 1);
+  // getSetting from <settings> (Mixtrack Platinum has some)
+  ctl.stop();
+  check('stop', ctl.state === 'stopped' && !document.querySelector('iframe'));
+  return checks;
+}
+
+document.getElementById('filter').value = new URLSearchParams(location.search).get('filter') || '';
+document.getElementById('run').onclick = run;
+run();
+</script>
+</body>
+</html>
