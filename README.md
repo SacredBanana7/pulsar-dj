@@ -29,7 +29,7 @@ Pulsar läuft komplett lokal: Web Audio (AudioWorklet) für den Sound, Web MIDI 
 
 ## Starten
 
-**Windows:** `Pulsar DJ.exe` aus den [Releases](https://github.com/SacredBanana7/pulsar-dj/releases) neben den `app`-Ordner legen und doppelklicken. Pulsar öffnet sich dann als eigenes Fenster (Chrome oder Edge muss installiert sein). Die EXE baust du selbst mit `launcher\build.cmd`.
+**Windows:** Repo herunterladen und `launcher\build.cmd` ausführen. Der benötigte C#-Compiler gehört zu Windows, es muss nichts installiert werden. Danach `Pulsar DJ.exe` im Hauptordner doppelklicken. Pulsar öffnet sich als eigenes Fenster (Chrome oder Edge muss installiert sein), Node.js wird nicht gebraucht.
 
 **Überall (Node.js ≥ 18):**
 
