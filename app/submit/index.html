@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Musik einreichen · open-dj-library</title>
+<meta name="description" content="Bring deine frei lizenzierte Musik in die open-dj-library, damit DJs sie in Pulsar und anderer Software auflegen können.">
+<style>
+:root { --bg:#07080b; --panel:#10131b; --line:#232835; --text:#eef2f8; --muted:#8a93a6; --a:#22d3ee; --good:#3ddc84; --hot:#ff3b5c; --fx:#a855f7; }
+* { box-sizing:border-box; }
+body { margin:0; background:var(--bg); color:var(--text); font:15px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif; }
+main { max-width:620px; margin:0 auto; padding:32px 16px 64px; }
+h1 { font-size:28px; margin:0 0 4px; } h1 b { color:var(--fx); }
+.lead { color:var(--muted); margin:0 0 28px; }
+ol.steps { padding:0; margin:0 0 28px; list-style:none; counter-reset:s; display:grid; gap:10px; }
+ol.steps li { counter-increment:s; background:var(--panel); border:1px solid var(--line); border-radius:12px; padding:12px 14px 12px 48px; position:relative; }
+ol.steps li::before { content:counter(s); position:absolute; left:14px; top:12px; width:24px; height:24px; border-radius:50%; background:var(--fx); color:#fff; font-weight:800; display:grid; place-items:center; font-size:13px; }
+a { color:var(--a); }
+form { background:var(--panel); border:1px solid var(--line); border-radius:14px; padding:18px; display:grid; gap:16px; }
+label { display:grid; gap:6px; font-weight:700; font-size:14px; }
+input[type=url], select { width:100%; padding:11px 12px; border-radius:9px; border:1px solid var(--line); background:var(--bg); color:var(--text); font:inherit; }
+input:focus, select:focus { outline:2px solid var(--fx); outline-offset:1px; }
+.check { display:flex; gap:10px; align-items:flex-start; font-weight:400; color:var(--muted); }
+.check input { margin-top:4px; accent-color:var(--fx); width:18px; height:18px; flex:none; }
+button { padding:13px; border:0; border-radius:10px; background:var(--fx); color:#fff; font:800 15px system-ui,sans-serif; cursor:pointer; }
+button:disabled { opacity:.4; cursor:not-allowed; }
+#result { border-radius:10px; padding:12px 14px; display:none; }
+#result.ok { display:block; background:#3ddc8418; border:1px solid #3ddc8455; }
+#result.bad { display:block; background:#ff3b5c18; border:1px solid #ff3b5c55; }
+#result.wait { display:block; color:var(--muted); border:1px dashed var(--line); }
+#result ul { margin:8px 0 0; padding-left:18px; color:var(--muted); font-size:13px; max-height:180px; overflow:auto; }
+.tag { display:inline-block; padding:1px 8px; border-radius:20px; background:var(--good); color:#04150b; font-weight:800; font-size:12px; }
+.note { color:var(--muted); font-size:13px; margin-top:20px; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Deine Musik in die <b>open-dj-library</b></h1>
+  <p class="lead">Du machst Musik und willst, dass DJs sie auflegen? Reich sie hier ein. Danach finden DJs sie in Pulsar und jeder anderen Software, die die Library nutzt, gleich mit BPM, Beatgrid und Tonart.</p>
+
+  <ol class="steps">
+    <li>Lade deine Tracks als <b>MP3</b> auf <a href="https://archive.org/upload" target="_blank" rel="noopener">archive.org/upload</a> hoch. Das ist kostenlos und dauerhaft.</li>
+    <li>Wähle beim Upload unter <i>License</i> eine <b>Creative-Commons-Lizenz</b>, z. B. CC BY 4.0, oder CC0.</li>
+    <li>Kopiere den Link zur Seite deines Uploads hier rein und klick auf „Einreichen“.</li>
+  </ol>
+
+  <form id="f">
+    <label>archive.org-Link
+      <input type="url" id="link" required placeholder="https://archive.org/details/mein-album" autocomplete="off">
+    </label>
+    <div id="result" role="status" aria-live="polite"></div>
+    <label>Genre
+      <select id="genre">
+        <option value="techno">Techno</option><option value="house">House</option><option value="dnb">Drum &amp; Bass</option>
+        <option value="dubstep">Dubstep</option><option value="trance">Trance</option><option value="hiphop">Hip-Hop</option>
+        <option value="disco">Disco / Funk</option><option value="electro">Electro</option><option value="breaks">Breakbeat</option>
+        <option value="electronica">Electronica</option><option value="ambient">Ambient / Downtempo</option><option value="experimental">Experimental</option>
+      </select>
+    </label>
+    <label class="check"><input type="checkbox" id="rights" required>
+      <span>Ich habe die Rechte an dieser Musik, weil ich sie selbst gemacht habe oder alle Beteiligten einverstanden sind. Sie enthält keine fremden, nicht freigegebenen Samples.</span></label>
+    <button id="send" disabled>Einreichen</button>
+  </form>
+
+  <p class="note">Mit „Einreichen“ öffnet sich GitHub mit deinen Angaben, du brauchst dafür ein kostenloses GitHub-Konto. Ein Bot analysiert die Tracks und meldet sich dort. Gespeichert werden nur die Daten und der Link, deine Musik bleibt auf archive.org. Mehr unter <a href="https://github.com/SacredBanana7/open-dj-library">github.com/SacredBanana7/open-dj-library</a>.</p>
+</main>
+<script>
+const $ = (id) => document.getElementById(id);
+const REPO = 'https://github.com/SacredBanana7/open-dj-library';
+let checked = null, timer = 0, seq = 0;
+const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]);
+const first = (v) => (Array.isArray(v) ? v[0] : v) || '';
+const idOf = (link) => /archive\.org\/(?:details|download)\/([A-Za-z0-9._-]+)/.exec(link)?.[1] || '';
+
+function show(cls, html) { const r = $('result'); r.className = cls; r.innerHTML = html; }
+function update() { $('send').disabled = !(checked && $('rights').checked); }
+
+// look the upload up on archive.org while typing: license and MP3 files
+async function lookup() {
+  checked = null; update();
+  const id = idOf($('link').value.trim()), my = ++seq;
+  if (!$('link').value.trim()) return show('', '');
+  if (!id) return show('bad', 'Das ist kein archive.org-Link. Er sieht so aus: <b>https://archive.org/details/…</b>');
+  show('wait', 'Prüfe deinen Upload auf archive.org …');
+  try {
+    const res = await fetch(`https://archive.org/metadata/${encodeURIComponent(id)}`);
+    const json = await res.json();
+    if (my !== seq) return;
+    if (!json.metadata) return show('bad', 'Diesen Upload gibt es auf archive.org nicht, oder er ist noch in Bearbeitung. Nach einem frischen Upload kann das ein paar Minuten dauern.');
+    const md = json.metadata, lic = first(md.licenseurl);
+    const names = [...new Set((json.files || []).filter((f) => /\.mp3$/i.test(f.name)).map((f) => first(f.title) || f.name.split('/').pop()))];
+    const title = esc(first(md.title) || id), who = esc(first(md.creator) || first((json.files || []).find((f) => f.artist)?.artist) || 'unbekannt');
+    if (!/creativecommons\.org|publicdomain/i.test(lic))
+      return show('bad', `<b>${title}</b> hat keine Creative-Commons-Lizenz.<br>Öffne auf archive.org „Edit item“ und wähle unter <i>License</i> z. B. CC BY 4.0.`);
+    if (!names.length) return show('bad', `<b>${title}</b> enthält keine MP3-Dateien. Lade deine Tracks als MP3 hoch.`);
+    const label = /publicdomain\/zero/i.test(lic) ? 'CC0' : 'CC ' + (/licenses\/([a-z-]+)\/([\d.]+)/i.exec(lic) || []).slice(1).join(' ').toUpperCase();
+    const nc = /-nc/i.test(lic) ? '<br><small>Hinweis: Mit NC dürfen DJs deine Musik nur bei unbezahlten Auftritten spielen.</small>' : '';
+    checked = { id };
+    show('ok', `<span class="tag">${esc(label)}</span> <b>${title}</b> von ${who} · ${names.length} Tracks${nc}<ul>${names.slice(0, 40).map((n) => `<li>${esc(n)}</li>`).join('')}</ul>`);
+    update();
+  } catch { if (my === seq) show('bad', 'archive.org ist gerade nicht erreichbar. Versuch es gleich nochmal.'); }
+}
+$('link').addEventListener('input', () => { clearTimeout(timer); timer = setTimeout(lookup, 400); });
+$('rights').addEventListener('change', update);
+$('f').addEventListener('submit', (e) => {
+  e.preventDefault();
+  if (!checked) return;
+  // GitHub issue forms take their fields from the query string
+  const q = new URLSearchParams({ template: 'track-einreichen.yml', title: `Einreichung: ${checked.id}`,
+    link: `https://archive.org/details/${checked.id}`, genre: $('genre').value });
+  window.open(`${REPO}/issues/new?${q}`, '_blank', 'noopener');
+});
+</script>
+</body>
+</html>
