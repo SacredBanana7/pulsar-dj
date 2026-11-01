@@ -30,6 +30,11 @@ header { display:flex; align-items:center; gap:10px; }
 .btn { flex:1; padding:10px 0; border-radius:10px; border:1px solid var(--line); background:#171b25; color:var(--text); font-weight:800; font-size:13px; }
 .btn.on { background:var(--c); color:#05070a; border-color:var(--c); }
 .btn.kill.on { background:var(--hot); border-color:var(--hot); color:#fff; }
+.prog { position:relative; height:16px; border-radius:8px; background:#0b0d13; overflow:hidden; border:1px solid var(--line); grid-column:1 / -1; }
+.prog b { position:absolute; left:0; top:0; bottom:0; background:linear-gradient(90deg, #ffffff22 0 25%, #ffffff33 25% 50%, var(--c) 50% 75%, #ff9f1c 75%); background-size:var(--w,100%) 100%; width:0; opacity:.7; }
+.prog .sec { position:relative; display:block; text-align:center; font-size:10px; font-weight:800; letter-spacing:.08em; line-height:14px; }
+.deck.ending { animation:warn .5s steps(2) infinite; }
+@keyframes warn { 50% { border-color:#ff9f1c; box-shadow:0 0 18px -4px #ff9f1c; } }
 .pads { display:grid; grid-template-columns:1fr 1fr; gap:6px; }
 .pad { padding:14px 0; border-radius:10px; border:1px solid #a855f755; background:#a855f714; color:#d9b8ff; font-weight:800; font-size:12px; }
 .pad.on { background:var(--fx); color:#fff; }
@@ -83,7 +88,7 @@ footer { display:grid; gap:6px; }
 <div id="start">
   <div>
     <h1>PULSAR<br>POCKET</h1>
-    <p>Zwei Decks, eine Crowd. Wähl Loops, mix mit dem Crossfader, drück die Effekte genau auf den Beat und bring die Crowd zum Kochen. Kopfhörer auf, Lautstärke hoch!</p>
+    <p>Zwei Decks, eine Crowd. Jeder Track hat Intro, Build, Drop und Outro: misch rechtzeitig rüber, bevor er endet! Wähl Tracks, mix mit dem Crossfader, drück die Effekte genau auf den Beat und bring die Crowd zum Kochen. Kopfhörer auf, Lautstärke hoch!</p>
     <button id="go">Auflegen</button>
     <a href="../">Zur vollen Version von Pulsar DJ →</a>
   </div>
@@ -93,7 +98,12 @@ footer { display:grid; gap:6px; }
 // the browser (no audio files, no licences needed). Both decks run in the same
 // tempo and start on the bar, so every mix is in sync; the game part rewards
 // smooth crossfades and effects hit on the beat.
-const BPM = 124, BEAT = 60 / BPM, BAR = BEAT * 4, LOOP_BARS = 8, LOOP = BAR * LOOP_BARS;
+// every track is a short song: intro 4 / build 4 / drop 8 / outro 4 bars (~39 s)
+const BPM = 124, BEAT = 60 / BPM, BAR = BEAT * 4;
+const SECTIONS = ['INTRO', 'BUILD', 'DROP', 'OUTRO'], SEC_BARS = [4, 4, 8, 4];
+const LOOP_BARS = SEC_BARS.reduce((a, b) => a + b), LOOP = BAR * LOOP_BARS;
+const SEC_START = SEC_BARS.map((_, i) => SEC_BARS.slice(0, i).reduce((a, b) => a + b, 0));
+const secOf = (bar) => { let i = 3; while (i > 0 && bar < SEC_START[i]) i--; return i; };
 const NOTE = (m) => 440 * Math.pow(2, (m - 69) / 12);
 
 // --- track recipes: [name, root midi, minor?, style] ---
@@ -104,7 +114,7 @@ const TRACKS = [
 
 let ctx, master, comp, analyser, buffers = [];
 async function renderTrack([name, root, minor, style], idx) {
-  const sr = 44100, oc = new OfflineAudioContext(2, Math.ceil(LOOP * sr), sr);
+  const sr = 32000, oc = new OfflineAudioContext(2, Math.ceil(LOOP * sr), sr);
   const out = oc.createGain(); out.gain.value = 0.8; out.connect(oc.destination);
   const scale = minor ? [0, 2, 3, 5, 7, 8, 10] : [0, 2, 4, 5, 7, 9, 11];
   const prog = minor ? [0, 5, 2, 6] : [0, 4, 5, 3];
@@ -116,14 +126,21 @@ async function renderTrack([name, root, minor, style], idx) {
   const tone = (t, freq, dur, type, vol, cutoff = 2000, q = 1, sweep = 0) => { const o = oc.createOscillator(), f = oc.createBiquadFilter(), g = oc.createGain(); o.type = type; o.frequency.value = freq; f.type = 'lowpass'; f.frequency.setValueAtTime(cutoff + sweep, t); f.frequency.exponentialRampToValueAtTime(Math.max(80, cutoff), t + dur); f.Q.value = q; env(g, t, 0.005, dur, vol); o.connect(f).connect(g).connect(out); o.start(t); o.stop(t + dur + 0.05); };
   const deg = (d, oct = 0) => root + scale[((d % 7) + 7) % 7] + 12 * (Math.floor(d / 7) + oct);
   for (let bar = 0; bar < LOOP_BARS; bar++) {
-    const chordDeg = prog[bar % 4], t0 = bar * BAR;
+    const chordDeg = prog[bar % 4], t0 = bar * BAR, sec = secOf(bar), inSec = bar - SEC_START[sec];
+    if (sec === 2 && inSec >= 4) continue; // second half of the drop is copied after rendering
+    const bassOn = sec === 1 || sec === 2, chordsOn = sec >= 1 && !(sec === 3 && inSec >= 2), leadOn = sec === 2;
+    // build: snare roll + noise riser into the drop
+    if (sec === 1 && inSec >= 2) for (let r = 0; r < (inSec === 3 ? 16 : 8); r++) hiss(t0 + r * BAR / (inSec === 3 ? 16 : 8), 0.08, 1800, 0.12 + r * 0.012, 'bandpass');
+    if (sec === 1 && inSec === 0) { const s2 = oc.createBufferSource(), fl = oc.createBiquadFilter(), gg = oc.createGain(); s2.buffer = noise; s2.loop = true; fl.type = 'bandpass'; fl.Q.value = 3; fl.frequency.setValueAtTime(300, t0); fl.frequency.exponentialRampToValueAtTime(9000, t0 + BAR * 4); gg.gain.setValueAtTime(0.0001, t0); gg.gain.exponentialRampToValueAtTime(0.18, t0 + BAR * 4 - 0.05); gg.gain.linearRampToValueAtTime(0, t0 + BAR * 4); s2.connect(fl).connect(gg).connect(out); s2.start(t0); s2.stop(t0 + BAR * 4); }
+    const kickOn = !(sec === 1 && inSec === 3);
     for (let b = 0; b < 4; b++) {
       const t = t0 + b * BEAT;
-      kick(t);
+      if (kickOn) kick(t);
       hiss(t + BEAT / 2, style === 'disco' ? 0.18 : 0.05, 8000, style === 'techno' ? 0.25 : 0.18);
       if (style !== 'deep') hiss(t + BEAT / 4, 0.02, 10000, 0.07);
       if (b % 2 === 1) hiss(t, 0.14, 1500, style === 'techno' ? 0.15 : 0.3, 'bandpass');
       // bass
+      if (!bassOn) continue;
       const bn = NOTE(deg(chordDeg, -2));
       if (style === 'acid') for (let s = 0; s < 4; s++) tone(t + s * BEAT / 4, bn * (s === 2 ? 2 : 1), 0.11, 'sawtooth', 0.22, 300 + 200 * Math.sin(bar + s), 14, 1800);
       else if (style === 'disco') { tone(t, bn, 0.18, 'sawtooth', 0.25, 700); tone(t + BEAT / 2, bn * 2, 0.18, 'sawtooth', 0.22, 900); }
@@ -132,13 +149,17 @@ async function renderTrack([name, root, minor, style], idx) {
     }
     // chords / stabs
     const ch = [0, 2, 4].map((k) => NOTE(deg(chordDeg + k)));
+    if (!chordsOn) continue;
     if (style === 'house' || style === 'deep') for (const off of [0.5, 1.5, 2.75, 3.5]) ch.forEach((f) => tone(t0 + off * BEAT, f, 0.22, 'sawtooth', 0.06, style === 'deep' ? 900 : 1800, 2));
     else if (style === 'disco') ch.forEach((f) => tone(t0, f, BAR * 0.9, 'sawtooth', 0.04, 2500));
     else if (style === 'techno') tone(t0 + BEAT * 1.5, ch[0] * 2, 0.3, 'square', 0.05, 1200, 8, 2000);
     // lead arp in the second half of the loop
-    if (bar >= 4 && style !== 'techno') for (let s = 0; s < 8; s++) tone(t0 + s * BEAT / 2, NOTE(deg(chordDeg + [0, 2, 4, 7, 4, 2, 0, 2][s], 1)), 0.16, 'square', 0.035, 3000);
+    if (leadOn && style !== 'techno') for (let s = 0; s < 8; s++) tone(t0 + s * BEAT / 2, NOTE(deg(chordDeg + [0, 2, 4, 7, 4, 2, 0, 2][s], 1)), 0.16, 'square', 0.035, 3000);
   }
-  buffers[idx] = await oc.startRendering();
+  const buf = await oc.startRendering();
+  const from = Math.round(SEC_START[2] * BAR * sr), len = Math.round(4 * BAR * sr);
+  for (let c = 0; c < buf.numberOfChannels; c++) { const d = buf.getChannelData(c); d.copyWithin(from + len, from, from + len); }
+  buffers[idx] = buf;
 }
 
 // --- live decks ---
@@ -161,17 +182,28 @@ class Deck {
   }
   start(at, offset) {
     this.stopSrc(at);
-    const s = ctx.createBufferSource(); s.buffer = buffers[this.track]; s.loop = true; s.connect(this.input);
+    const s = ctx.createBufferSource(); s.buffer = buffers[this.track]; s.connect(this.input);
+    s.onended = () => { if (this.src === s) this.ended(); };
     s.start(at, offset); this.src = s; this.srcStart = at - offset;
   }
   stopSrc(at) { if (this.src) { try { this.src.stop(at ?? 0); } catch {} this.src = null; } }
   play() {
     if (!clockStart) clockStart = ctx.currentTime + 0.05;
-    const at = nextBar(); this.start(at, phaseAt(at)); this.playing = true; this.playedAt = at;
+    const at = nextBar(); this.start(at, 0); this.playing = true; this.playedAt = at; this.warned = false;
+  }
+  // position within the song (s) and current section
+  pos() { return this.playing ? Math.max(0, ctx.currentTime - this.srcStart) : 0; }
+  section() { return SECTIONS[secOf(Math.min(LOOP_BARS - 1, Math.floor(this.pos() / BAR)))]; }
+  ended() {
+    this.src = null; this.playing = false;
+    const audible = this.xf.gain.value > 0.2;
+    const other = decks.find((d) => d !== this);
+    if (audible && !(other.playing && other.xf.gain.value > 0.2)) { combo = 1; crowd = Math.max(0.05, crowd - 0.3); pop('STILLE! 😱', '#ff3b5c'); }
+    render();
   }
   stop() { this.stopSrc(); this.playing = false; }
-  load(i) { this.track = i; if (this.playing) { const at = nextBar(); this.start(at, phaseAt(at)); } }
-  resync() { if (this.playing) { const at = ctx.currentTime + 0.01; this.start(at, phaseAt(at)); } }
+  load(i) { this.track = i; if (this.playing) { const at = nextBar(); this.start(at, 0); this.warned = false; } }
+  resync() { if (this.playing) { const at = ctx.currentTime + 0.01; this.start(at, Math.max(0, at - this.srcStart)); } }
   setFilter(v) { // 0..1, 0.5 = off
     const t = ctx.currentTime;
     if (Math.abs(v - 0.5) < 0.04) { this.filter.type = 'allpass'; return; }
@@ -183,12 +215,13 @@ class Deck {
 }
 
 // --- game state ---
-let decks = [], xfVal = 0, score = 0, combo = 1, crowd = 0.15, lastSide = 'A', mixStart = 0, mixesDone = 0, perfects = 0;
+let outroMixes = 0, decks = [], xfVal = 0, score = 0, combo = 1, crowd = 0.15, lastSide = 'A', mixStart = 0, mixesDone = 0, perfects = 0;
 const missions = [
   { text: 'Starte Deck A', done: () => decks[0].playing },
   { text: 'Starte Deck B und schieb den Crossfader rüber', done: () => mixesDone >= 1 },
   { text: 'Triff 3 Effekte perfekt auf den Beat', done: () => perfects >= 3 },
   { text: 'Mix 3 verschiedene Tracks', done: () => new Set(playedTracks).size >= 3 },
+  { text: 'Wechsle im OUTRO aufs andere Deck, bevor der Track endet', done: () => outroMixes >= 1 },
   { text: 'Bring die Crowd auf 80 %', done: () => crowd >= 0.8 },
   { text: 'Freies Auflegen: hol dir den Highscore!', done: () => false },
 ];
@@ -222,6 +255,7 @@ function slider(el, value, onInput, def) {
 function buildDeck(d, el) {
   el.innerHTML = `<h3><span>DECK ${d.side}</span><span class="tn"></span></h3>
     <div class="tracks">${TRACKS.map((t, i) => `<button class="trk" data-i="${i}">${t[0]}</button>`).join('')}</div>
+    <div class="prog"><b></b><span class="sec">–</span></div>
     <div class="platter"><i></i><span>${d.side}</span></div>
     <div class="ctrls">
       <div class="row"><button class="btn play">▶ PLAY</button></div>
@@ -229,7 +263,7 @@ function buildDeck(d, el) {
       <div class="slider flt"><div class="k"></div><small>FILTER</small></div>
       <div class="pads"><button class="pad" data-fx="echo">ECHO</button><button class="pad" data-fx="roll">ROLL</button><button class="pad" data-fx="drop">DROP</button><button class="pad" data-fx="spin">SPIN</button></div>
     </div>`;
-  d.el = el; d.arm = el.querySelector('.platter i');
+  d.el = el; d.arm = el.querySelector('.platter i'); d.bar = el.querySelector('.prog b'); d.secEl = el.querySelector('.prog .sec');
   el.querySelectorAll('.trk').forEach((b) => b.onclick = () => { d.load(+b.dataset.i); if (d.playing) { playedTracks.push(d.track); addScore(60); } render(); });
   el.querySelector('.play').onclick = () => {
     if (d.playing) d.stop(); else { d.play(); playedTracks.push(d.track); const g = grade(); if (g !== 'miss') addScore(100, 'ON THE ONE', '#22d3ee'); }
@@ -242,7 +276,7 @@ function buildDeck(d, el) {
     p.onpointerdown = () => {
       if (!d.playing) return; p.classList.add('on'); hit(fx.toUpperCase()); const t = ctx.currentTime;
       if (fx === 'echo') { d.echoSend.gain.setTargetAtTime(0.8, t, 0.01); d.fb.gain.setTargetAtTime(0.55, t, 0.01); }
-      if (fx === 'roll' && d.src) { const pos = (t - d.srcStart) % LOOP; const s = BEAT / 4; d.src.loopStart = Math.floor(pos / s) * s; d.src.loopEnd = d.src.loopStart + s; }
+      if (fx === 'roll' && d.src) { const pos = t - d.srcStart; const s = BEAT / 4; d.src.loopStart = Math.floor(pos / s) * s; d.src.loopEnd = d.src.loopStart + s; }
       if (fx === 'drop') { d.low.gain.setTargetAtTime(-40, t, 0.01); d.vol.gain.setTargetAtTime(0.35, t, 0.02); }
       if (fx === 'spin' && d.src) d.src.playbackRate.setTargetAtTime(0.25, t, 0.25);
     };
@@ -285,12 +319,14 @@ function setXf(v) {
       else if (beats >= 4 && beats <= 64) { combo = Math.min(8, combo + 1); addScore(500, `SMOOTH MIX  x${combo}`, '#3ddc84'); }
       else addScore(150, beats < 4 ? 'HARTER CUT' : 'LANGER MIX', '#22d3ee');
     }
+    const left = decks[side === 'A' ? 1 : 0];
+    if (left.playing && left.section() === 'OUTRO' && decks[side === 'A' ? 0 : 1].playing) { outroMixes++; setTimeout(() => addScore(300, 'PERFEKTES TIMING', '#ff9f1c'), 500); }
     lastSide = side; mixStart = 0;
   } else if (side) mixStart = 0;
 }
 function render() {
   decks.forEach((d) => {
-    d.el.querySelectorAll('.trk').forEach((b) => b.classList.toggle('on', +b.dataset.i === d.track));
+    d.el.querySelectorAll('.trk').forEach((b) => { b.classList.toggle('on', +b.dataset.i === d.track); b.disabled = !buffers[+b.dataset.i]; b.style.opacity = buffers[+b.dataset.i] ? 1 : 0.35; });
     d.el.querySelector('.play').classList.toggle('on', d.playing);
     d.el.querySelector('.play').textContent = d.playing ? '■ STOP' : '▶ PLAY';
     d.el.querySelectorAll('.kill').forEach((b) => b.classList.toggle('on', !!d.kills[b.dataset.b]));
@@ -329,16 +365,22 @@ function frame() {
   if (ctx) {
     crowd = Math.max(0.05, crowd - (anyPlaying ? 0.00025 : 0.002));
     if (!decks.some((d) => d.playing && d.xf.gain.value > 0.2)) crowd = Math.max(0.05, crowd - 0.003);
+    decks.forEach((d) => {
+      const p = d.pos() / LOOP, sec = d.playing ? d.section() : '–';
+      d.bar.style.width = `${Math.min(100, p * 100)}%`;
+      d.secEl.textContent = d.playing ? `${sec} · noch ${Math.max(0, Math.ceil((LOOP - d.pos()) / BAR))} Takte` : 'gestoppt';
+      d.el.classList.toggle('ending', d.playing && sec === 'OUTRO' && d.xf.gain.value > 0.2);
+      if (d.playing && sec === 'OUTRO' && !d.warned && d.xf.gain.value > 0.2) { d.warned = true; pop('JETZT MIXEN!', '#ff9f1c'); }
+    });
     decks.forEach((d) => { if (d.playing && clockStart) d.arm.style.transform = `rotate(${((ctx.currentTime - clockStart) / 1.8) * 360}deg)`; });
     const beatNo = clockStart ? Math.floor((ctx.currentTime - clockStart) / BEAT) % 4 : -1;
     document.querySelectorAll('#beats i').forEach((b, i) => b.classList.toggle('on', anyPlaying && i === beatNo));
   }
   document.getElementById('score').textContent = score.toLocaleString('de-DE');
   document.getElementById('combo').textContent = `Crowd ${Math.round(crowd * 100)} %${combo > 1 ? `  ·  Combo x${combo}` : ''}`;
-  const m = missions.find((x) => !x.done());
+  const m = decks.length ? missions.find((x) => !x.done()) : missions[0];
   document.getElementById('mission').innerHTML = `Mission: <b>${m.text}</b>`;
-  const best = +localStorage.getItem('pocket.best') || 0;
-  if (score > best) localStorage.setItem('pocket.best', score);
+  try { if (score > (+localStorage.getItem('pocket.best') || 0)) localStorage.setItem('pocket.best', score); } catch {}
 }
 
 document.getElementById('go').onclick = async () => {
@@ -347,7 +389,8 @@ document.getElementById('go').onclick = async () => {
   comp = ctx.createDynamicsCompressor(); comp.threshold.value = -10; comp.ratio.value = 6;
   master = ctx.createGain(); master.gain.value = 0.9; analyser = ctx.createAnalyser(); analyser.fftSize = 128;
   master.connect(comp).connect(analyser).connect(ctx.destination);
-  await Promise.all(TRACKS.map(renderTrack));
+  await renderTrack(TRACKS[0], 0); await renderTrack(TRACKS[2], 2);
+  (async () => { for (const i of [1, 3, 4, 5]) { await renderTrack(TRACKS[i], i); render(); } })();
   decks = [new Deck(0, 'A'), new Deck(1, 'B')];
   buildDeck(decks[0], document.getElementById('deckA')); buildDeck(decks[1], document.getElementById('deckB'));
   slider(document.getElementById('xf'), 0, setXf, 0.5); setXf(0);
