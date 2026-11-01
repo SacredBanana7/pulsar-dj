@@ -399,11 +399,22 @@ async function initMidi() {
     const ins = [...acc.inputs.values()], outs = [...acc.outputs.values()];
     const ddj = ins.find((i) => /DDJ/i.test(i.name));
     midiOut = outs.find((o) => /DDJ/i.test(o.name)) || null;
-    ins.forEach((i) => (i.onmidimessage = (e) => onMidi(e.data)));
+    ins.forEach((i) => (i.onmidimessage = (e) => { midiFeel(e.data); onMidi(e.data); }));
     document.getElementById('midi').textContent = ddj ? `🎛 ${ddj.name.replace(/^.*?(DDJ[-\w]*).*$/i, '$1')} verbunden` : ins.length ? `🎛 ${ins[0].name}` : '';
     if (midiOut) midiOut.send([0x9b, 0x08, 0x7f]); // ask for all knob/fader positions
   };
   acc.onstatechange = bind; bind();
+}
+// haptic + visual tick for every incoming message; buttons buzz longer than knobs
+let feelT = 0;
+function midiFeel([st, , v = 0]) {
+  const now = performance.now(), press = (st & 0xf0) === 0x90 && v > 0;
+  if (!press && now - feelT < 40) return;
+  feelT = now;
+  try { navigator.vibrate?.(press ? 25 : 6); } catch {}
+  const m = document.getElementById('midi');
+  m.style.transition = 'none'; m.style.color = press ? 'var(--fx)' : '#fff'; m.style.textShadow = '0 0 8px currentColor';
+  requestAnimationFrame(() => { m.style.transition = 'color .25s, text-shadow .25s'; m.style.color = 'var(--muted)'; m.style.textShadow = 'none'; });
 }
 function onMidi([st, n, v = 0]) {
   if (!decks.length) return;
