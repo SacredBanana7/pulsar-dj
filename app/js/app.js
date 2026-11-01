@@ -244,6 +244,7 @@ export class App {
       case 'fxAssign': e.fxUnits[t].assigned[a] = !e.fxUnits[t].assigned[a]; e.rewireFx(this.decks); break;
       case 'load': {
         // the library selection lives in the UI (row click, arrow keys, browse knob)
+        if (this.ui?.loadSelectedOpen(t)) break;
         const track = this.ui?.selected || this.selected;
         if (!track) {
           this.toast('Erst einen Track in der Bibliothek auswählen (Browse-Regler drehen oder anklicken).', 'warn');

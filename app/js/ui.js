@@ -42,6 +42,7 @@ export class UI {
     this.rows = [];
     this.libDirty = true;
     this.browseFocus = 'list';
+    this.onlineFocus = false;    // browse knob / LOAD act on the free-music list
     app.ui = this;
     app.library.onChange(() => { this.libDirty = true; });
     app.midi.onUpdate = (fromMsg) => { if (!fromMsg) this.renderMidiStatus(); };
@@ -984,7 +985,7 @@ export class UI {
       class: `lib-row${t === this.selected ? ' sel' : ''}${a.library.history.includes(t) ? ' played' : ''}${!a.library.available(t) ? ' missing' : ''}`,
       style: { top: `${i * ROW_H}px` },
       draggable: 'true',
-      onclick: () => { this.selected = t; this.renderRows(true); },
+      onclick: () => { this.selected = t; this.onlineFocus = false; this.renderRows(true); },
       ondblclick: () => {
         const target = a.decks.slice(0, a.settings.fourDecks ? 4 : 2).find((d) => !d.playing) || a.decks[0];
         a.loadTrack(target.index, t);
@@ -1006,15 +1007,32 @@ export class UI {
     return el;
   }
 
+  // the collection list and the free-music list below it form one browse list
   moveSelection(delta) {
-    if (!this.rows.length) return;
+    const onlineView = this.libView === 'online';
+    const showOnline = onlineView || this.online.active;
     let i = this.rows.indexOf(this.selected);
+    if (showOnline && (onlineView || !this.rows.length || this.onlineFocus || (delta > 0 && i === this.rows.length - 1))) {
+      if (this.online.moveSelection(delta)) { this.onlineFocus = true; return; }
+      this.onlineFocus = false;
+      if (onlineView || !this.rows.length) return;
+      i = this.rows.length;   // moved up out of the free-music list: back to the last collection row
+    }
+    if (!this.rows.length) return;
+    this.onlineFocus = false;
     i = Math.max(0, Math.min(this.rows.length - 1, (i < 0 ? -1 : i) + delta));
     this.selected = this.rows[i];
     const y = i * ROW_H;
     if (y < this.list.scrollTop) this.list.scrollTop = y;
     else if (y + ROW_H > this.list.scrollTop + this.list.clientHeight) this.list.scrollTop = y + ROW_H - this.list.clientHeight;
     this.renderRows(true);
+  }
+
+  // LOAD on a selected free-music result; false when the collection selection applies
+  loadSelectedOpen(deck) {
+    const onlineView = this.libView === 'online';
+    if (!(onlineView || (this.online.active && this.onlineFocus))) return false;
+    return this.online.loadSelected(deck);
   }
 
   toggleBrowseFocus() {

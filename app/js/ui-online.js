@@ -98,6 +98,8 @@ export class OnlinePanel {
     this.expanded = new Map();   // archive album id -> tracks[] | 'loading'
     this.results = new Map();    // key -> result (for drag & drop)
     this.busy = new Map();       // result key -> progress
+    this.order = [];             // keys in display order (browse knob, arrow keys)
+    this.sel = '';               // selected result key
     this.preview = new Preview(this.app);
     this.catalog = new Catalog();
     this.catalog.load().then(() => this.active && this.render());
@@ -252,6 +254,36 @@ export class OnlinePanel {
     }
   }
 
+  // browse knob / arrow keys; returns false when moving up past the first row
+  moveSelection(delta) {
+    if (!this.order.length) return false;
+    let i = this.order.indexOf(this.sel);
+    if (i < 0) i = delta > 0 ? 0 : this.order.length - 1;
+    else if (i + delta < 0) { this.select(''); return false; }
+    else i = Math.min(this.order.length - 1, i + delta);
+    this.select(this.order[i]);
+    return true;
+  }
+
+  select(k) {
+    this.sel = k;
+    if (k) this.ui.onlineFocus = true;
+    this.body.querySelectorAll('.orow.sel').forEach((el) => el.classList.remove('sel'));
+    const el = k && this.body.querySelector(`.orow[data-key="${CSS.escape(k)}"]`);
+    if (el) { el.classList.add('sel'); el.scrollIntoView({ block: 'nearest' }); }
+  }
+
+  get selected() { return this.sel ? this.results.get(this.sel) || null : null; }
+
+  // LOAD button / arrow-left/right on the selected result; albums unfold instead
+  loadSelected(deck) {
+    const r = this.selected;
+    if (!r) return false;
+    if (r.kind === 'album') this.toggleAlbum(r);
+    else this.load(deck, r);
+    return true;
+  }
+
   freeDeck() {
     const a = this.app;
     return (a.decks.slice(0, a.settings.fourDecks ? 4 : 2).find((d) => !d.playing) || a.decks[0]).index;
@@ -276,7 +308,7 @@ export class OnlinePanel {
     this.results.set(k, r);
     if (r.kind === 'album') {
       const open = this.expanded.get(r.id);
-      return h('div', { class: 'orow album', onclick: () => this.toggleAlbum(r) },
+      return h('div', { class: `orow album${k === this.sel ? ' sel' : ''}`, 'data-key': k, onclick: () => { this.sel = k; this.toggleAlbum(r); } },
         h('span', { class: 'ocaret' }, open ? '▾' : '▸'),
         h('div', { class: 'otitle' }, h('b', {}, r.title), h('span', { class: 'oartist' }, r.artist || '')),
         licenseBadge(r.license),
@@ -289,8 +321,10 @@ export class OnlinePanel {
     const playing = this.preview.current === r;
     const onDeck = this.app.decks.findIndex((d) => d.track && d.track.id === openTrackId(r));
     const el = h('div', {
-      class: `orow${nested ? ' nested' : ''}${playing ? ' playing' : ''}`,
+      class: `orow${nested ? ' nested' : ''}${playing ? ' playing' : ''}${k === this.sel ? ' sel' : ''}`,
+      'data-key': k,
       draggable: 'true',
+      onclick: (e) => { if (!e.target.closest('button, a')) this.select(k); },
       ondragstart: (e) => { e.dataTransfer.setData('text/pulsar-open', k); e.dataTransfer.effectAllowed = 'copy'; },
       ondblclick: () => this.load(this.freeDeck(), r),
     },
@@ -334,6 +368,7 @@ export class OnlinePanel {
     const total = groups.reduce((n, g) => n + (g.results?.length || 0), 0);
     setText(this.status, this.loading ? 'Suche läuft …' : `${total} freie Treffer`);
     this.results.clear();
+    this.order = [];
     const parts = [];
     for (const g of groups) {
       const rows = (g.results || []).filter((r) => r.kind === 'album' || this.matches(r));
@@ -342,11 +377,13 @@ export class OnlinePanel {
         g.ok ? h('small', {}, `${rows.length}${g.total > rows.length ? ` von ${g.total}` : ''}`) : h('small', { class: 'err' }, g.error || 'nicht erreichbar')));
       for (const r of rows) {
         parts.push(this.row(r));
+        this.order.push(this.key(r));
         const tracks = r.kind === 'album' ? this.expanded.get(r.id) : null;
-        if (Array.isArray(tracks)) for (const t of tracks) parts.push(this.row(t, true));
+        if (Array.isArray(tracks)) for (const t of tracks) { parts.push(this.row(t, true)); this.order.push(this.key(t)); }
       }
     }
     if (total && !this.loading) parts.push(h('div', { class: 'omore' }, this.more));
     this.body.replaceChildren(...parts);
+    if (this.sel && !this.results.has(this.sel)) this.sel = '';
   }
 }
