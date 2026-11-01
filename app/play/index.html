@@ -1,0 +1,359 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<meta name="theme-color" content="#07080b">
+<title>Pulsar Pocket</title>
+<style>
+:root { --bg:#07080b; --panel:#10131b; --line:#232835; --text:#eef2f8; --muted:#8a93a6; --a:#22d3ee; --b:#ff9f1c; --good:#3ddc84; --hot:#ff3b5c; --fx:#a855f7; }
+* { box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+html,body { margin:0; height:100%; background:var(--bg); color:var(--text); font:14px/1.2 system-ui,-apple-system,"Segoe UI",sans-serif; overflow:hidden; user-select:none; touch-action:none; }
+#app { height:100dvh; display:grid; grid-template-rows:auto 1fr auto; padding:max(8px,env(safe-area-inset-top)) 10px max(10px,env(safe-area-inset-bottom)); gap:8px; }
+header { display:flex; align-items:center; gap:10px; }
+.logo { font-weight:900; letter-spacing:.2em; font-size:15px; }
+.logo b { color:var(--a); }
+.stat { margin-left:auto; text-align:right; }
+.score { font:800 22px/1 ui-monospace,Consolas,monospace; }
+.combo { color:var(--fx); font-weight:800; font-size:12px; }
+.stage { position:relative; display:grid; grid-template-columns:1fr 1fr; gap:8px; min-height:0; }
+#crowd { position:absolute; inset:0; width:100%; height:100%; z-index:0; border-radius:14px; }
+.deck { position:relative; z-index:1; display:flex; flex-direction:column; gap:8px; padding:10px; border-radius:14px; background:#10131bcc; border:1px solid var(--line); border-top:3px solid var(--c); min-height:0; }
+.deck h3 { margin:0; font-size:13px; display:flex; justify-content:space-between; color:var(--c); }
+.tracks { display:flex; gap:5px; overflow-x:auto; scrollbar-width:none; }
+.trk { flex:none; padding:6px 9px; border-radius:20px; border:1px solid var(--line); background:transparent; color:var(--muted); font-weight:700; font-size:12px; }
+.trk.on { background:var(--c); color:#05070a; border-color:var(--c); }
+.platter { position:relative; aspect-ratio:1; width:min(100%,34vh); margin:0 auto; border-radius:50%; background:radial-gradient(circle,#1d212b 0 18%,#0c0e14 19% 100%); box-shadow:inset 0 0 0 4px #ffffff10, 0 0 30px -10px var(--c); }
+.platter i { position:absolute; left:50%; top:6%; width:4px; height:30%; margin-left:-2px; border-radius:2px; background:var(--c); transform-origin:50% 147%; }
+.platter span { position:absolute; inset:38%; border-radius:50%; background:var(--c); display:grid; place-items:center; color:#05070a; font-weight:900; font-size:clamp(12px,3vh,22px); }
+.row { display:flex; gap:6px; }
+.btn { flex:1; padding:10px 0; border-radius:10px; border:1px solid var(--line); background:#171b25; color:var(--text); font-weight:800; font-size:13px; }
+.btn.on { background:var(--c); color:#05070a; border-color:var(--c); }
+.btn.kill.on { background:var(--hot); border-color:var(--hot); color:#fff; }
+.pads { display:grid; grid-template-columns:1fr 1fr; gap:6px; }
+.pad { padding:14px 0; border-radius:10px; border:1px solid #a855f755; background:#a855f714; color:#d9b8ff; font-weight:800; font-size:12px; }
+.pad.on { background:var(--fx); color:#fff; }
+.slider { position:relative; height:34px; border-radius:17px; background:#0b0d13; border:1px solid var(--line); touch-action:none; }
+.slider .k { position:absolute; top:3px; width:44px; height:26px; margin-left:-22px; border-radius:13px; background:linear-gradient(#3a4152,#222734); border:1px solid #4a5266; }
+.slider small { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; color:var(--muted); font-size:10px; letter-spacing:.15em; pointer-events:none; }
+footer { display:grid; gap:6px; }
+.xf { display:flex; align-items:center; gap:8px; font-weight:900; }
+.xf .slider { flex:1; height:44px; }
+.xf .slider .k { width:60px; height:36px; margin-left:-30px; }
+.beats { display:flex; gap:4px; justify-content:center; }
+.beats i { width:22px; height:6px; border-radius:3px; background:#232835; }
+.beats i.on { background:var(--a); box-shadow:0 0 10px var(--a); }
+.mission { text-align:center; color:var(--muted); font-size:12px; }
+.mission b { color:var(--text); }
+.pop { position:fixed; left:50%; top:38%; transform:translate(-50%,-50%); font-weight:900; font-size:28px; pointer-events:none; text-shadow:0 0 20px currentColor; animation:pop .9s ease-out forwards; z-index:9; }
+@keyframes pop { from { opacity:1; transform:translate(-50%,-50%) scale(.6); } 30% { transform:translate(-50%,-50%) scale(1.15); } to { opacity:0; transform:translate(-50%,-110%) scale(1); } }
+#start { position:fixed; inset:0; z-index:20; background:#000d; display:grid; place-items:center; text-align:center; padding:20px; }
+#start h1 { letter-spacing:.3em; margin:0 0 6px; font-size:34px; }
+#start p { color:var(--muted); max-width:340px; margin:8px auto 18px; }
+#start button { font-size:18px; font-weight:900; padding:16px 44px; border:none; border-radius:40px; background:var(--a); color:#031317; }
+#start a { color:var(--muted); display:block; margin-top:16px; font-size:12px; }
+@media (orientation:portrait) {
+  .stage { grid-template-columns:1fr; grid-template-rows:1fr 1fr; }
+  .deck { display:grid; grid-template-columns:auto 1fr; grid-template-rows:auto auto 1fr; gap:6px 10px; }
+  .deck h3, .deck .tracks { grid-column:1 / -1; }
+  .platter { width:min(30vw,17vh); grid-row:3; align-self:center; }
+  .pad { padding:10px 0; } .btn { padding:8px 0; }
+  .ctrls { display:flex; flex-direction:column; gap:6px; grid-row:3; justify-content:center; }
+}
+@media (orientation:landscape) { .ctrls { display:flex; flex-direction:column; gap:8px; } }
+</style>
+</head>
+<body>
+<div id="app">
+  <header>
+    <div class="logo">PULSAR <b>POCKET</b></div>
+    <div class="stat"><div class="score" id="score">0</div><div class="combo" id="combo">Crowd 0 %</div></div>
+  </header>
+  <div class="stage">
+    <canvas id="crowd"></canvas>
+    <section class="deck" id="deckA" style="--c:var(--a)"></section>
+    <section class="deck" id="deckB" style="--c:var(--b)"></section>
+  </div>
+  <footer>
+    <div class="beats" id="beats"><i></i><i></i><i></i><i></i></div>
+    <div class="xf"><span style="color:var(--a)">A</span><div class="slider" id="xf"><div class="k"></div><small>CROSSFADER</small></div><span style="color:var(--b)">B</span></div>
+    <div class="mission" id="mission"></div>
+  </footer>
+</div>
+<div id="start">
+  <div>
+    <h1>PULSAR<br>POCKET</h1>
+    <p>Zwei Decks, eine Crowd. Wähl Loops, mix mit dem Crossfader, drück die Effekte genau auf den Beat und bring die Crowd zum Kochen. Kopfhörer auf, Lautstärke hoch!</p>
+    <button id="go">Auflegen</button>
+    <a href="../">Zur vollen Version von Pulsar DJ →</a>
+  </div>
+</div>
+<script>
+// Pulsar Pocket: a small DJ game for any device. All music is generated live in
+// the browser (no audio files, no licences needed). Both decks run in the same
+// tempo and start on the bar, so every mix is in sync; the game part rewards
+// smooth crossfades and effects hit on the beat.
+const BPM = 124, BEAT = 60 / BPM, BAR = BEAT * 4, LOOP_BARS = 8, LOOP = BAR * LOOP_BARS;
+const NOTE = (m) => 440 * Math.pow(2, (m - 69) / 12);
+
+// --- track recipes: [name, root midi, minor?, style] ---
+const TRACKS = [
+  ['Neon', 57, true, 'house'], ['Tiefgarage', 54, true, 'techno'], ['Sonnendeck', 60, false, 'disco'],
+  ['Kraftwerk', 50, true, 'electro'], ['Lichtung', 62, false, 'deep'], ['Sturm', 52, true, 'acid'],
+];
+
+let ctx, master, comp, analyser, buffers = [];
+async function renderTrack([name, root, minor, style], idx) {
+  const sr = 44100, oc = new OfflineAudioContext(2, Math.ceil(LOOP * sr), sr);
+  const out = oc.createGain(); out.gain.value = 0.8; out.connect(oc.destination);
+  const scale = minor ? [0, 2, 3, 5, 7, 8, 10] : [0, 2, 4, 5, 7, 9, 11];
+  const prog = minor ? [0, 5, 2, 6] : [0, 4, 5, 3];
+  const noise = oc.createBuffer(1, sr, sr); const nd = noise.getChannelData(0);
+  for (let i = 0; i < sr; i++) nd[i] = Math.random() * 2 - 1;
+  const env = (g, t, a, d, peak) => { g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(peak, t + a); g.gain.exponentialRampToValueAtTime(0.0001, t + a + d); };
+  const kick = (t) => { const o = oc.createOscillator(), g = oc.createGain(); o.frequency.setValueAtTime(style === 'techno' ? 130 : 150, t); o.frequency.exponentialRampToValueAtTime(42, t + 0.12); env(g, t, 0.002, 0.32, 1); o.connect(g).connect(out); o.start(t); o.stop(t + 0.4); };
+  const hiss = (t, dur, f, vol, type = 'highpass') => { const s = oc.createBufferSource(), fl = oc.createBiquadFilter(), g = oc.createGain(); s.buffer = noise; fl.type = type; fl.frequency.value = f; env(g, t, 0.001, dur, vol); s.connect(fl).connect(g).connect(out); s.start(t, Math.random() * 0.5); s.stop(t + dur + 0.05); };
+  const tone = (t, freq, dur, type, vol, cutoff = 2000, q = 1, sweep = 0) => { const o = oc.createOscillator(), f = oc.createBiquadFilter(), g = oc.createGain(); o.type = type; o.frequency.value = freq; f.type = 'lowpass'; f.frequency.setValueAtTime(cutoff + sweep, t); f.frequency.exponentialRampToValueAtTime(Math.max(80, cutoff), t + dur); f.Q.value = q; env(g, t, 0.005, dur, vol); o.connect(f).connect(g).connect(out); o.start(t); o.stop(t + dur + 0.05); };
+  const deg = (d, oct = 0) => root + scale[((d % 7) + 7) % 7] + 12 * (Math.floor(d / 7) + oct);
+  for (let bar = 0; bar < LOOP_BARS; bar++) {
+    const chordDeg = prog[bar % 4], t0 = bar * BAR;
+    for (let b = 0; b < 4; b++) {
+      const t = t0 + b * BEAT;
+      kick(t);
+      hiss(t + BEAT / 2, style === 'disco' ? 0.18 : 0.05, 8000, style === 'techno' ? 0.25 : 0.18);
+      if (style !== 'deep') hiss(t + BEAT / 4, 0.02, 10000, 0.07);
+      if (b % 2 === 1) hiss(t, 0.14, 1500, style === 'techno' ? 0.15 : 0.3, 'bandpass');
+      // bass
+      const bn = NOTE(deg(chordDeg, -2));
+      if (style === 'acid') for (let s = 0; s < 4; s++) tone(t + s * BEAT / 4, bn * (s === 2 ? 2 : 1), 0.11, 'sawtooth', 0.22, 300 + 200 * Math.sin(bar + s), 14, 1800);
+      else if (style === 'disco') { tone(t, bn, 0.18, 'sawtooth', 0.25, 700); tone(t + BEAT / 2, bn * 2, 0.18, 'sawtooth', 0.22, 900); }
+      else if (style === 'electro') tone(t + (b % 2 ? BEAT * 0.75 : 0), bn, 0.2, 'square', 0.2, 500, 4, 800);
+      else tone(t + BEAT / 2, bn, BEAT * 0.45, style === 'techno' ? 'sawtooth' : 'triangle', 0.32, 400, 2);
+    }
+    // chords / stabs
+    const ch = [0, 2, 4].map((k) => NOTE(deg(chordDeg + k)));
+    if (style === 'house' || style === 'deep') for (const off of [0.5, 1.5, 2.75, 3.5]) ch.forEach((f) => tone(t0 + off * BEAT, f, 0.22, 'sawtooth', 0.06, style === 'deep' ? 900 : 1800, 2));
+    else if (style === 'disco') ch.forEach((f) => tone(t0, f, BAR * 0.9, 'sawtooth', 0.04, 2500));
+    else if (style === 'techno') tone(t0 + BEAT * 1.5, ch[0] * 2, 0.3, 'square', 0.05, 1200, 8, 2000);
+    // lead arp in the second half of the loop
+    if (bar >= 4 && style !== 'techno') for (let s = 0; s < 8; s++) tone(t0 + s * BEAT / 2, NOTE(deg(chordDeg + [0, 2, 4, 7, 4, 2, 0, 2][s], 1)), 0.16, 'square', 0.035, 3000);
+  }
+  buffers[idx] = await oc.startRendering();
+}
+
+// --- live decks ---
+let clockStart = 0;
+const nextBar = () => { const now = ctx.currentTime + 0.03; return clockStart + Math.ceil((now - clockStart) / BAR) * BAR; };
+const phaseAt = (t) => ((t - clockStart) % LOOP + LOOP) % LOOP;
+
+class Deck {
+  constructor(id, side) {
+    this.id = id; this.side = side; this.track = side === 'A' ? 0 : 2; this.playing = false; this.src = null; this.kills = {};
+    this.input = ctx.createGain();
+    const mk = (type, f, g = 0) => { const b = ctx.createBiquadFilter(); b.type = type; b.frequency.value = f; b.gain.value = g; return b; };
+    this.low = mk('lowshelf', 200); this.mid = mk('peaking', 1000); this.mid.Q.value = 0.8; this.high = mk('highshelf', 3500);
+    this.filter = mk('allpass', 1000); this.filter.Q.value = 3;
+    this.echo = ctx.createDelay(2); this.echo.delayTime.value = BEAT * 0.75; this.fb = ctx.createGain(); this.fb.gain.value = 0;
+    this.echoSend = ctx.createGain(); this.echoSend.gain.value = 0;
+    this.vol = ctx.createGain(); this.xf = ctx.createGain();
+    this.input.connect(this.low).connect(this.mid).connect(this.high).connect(this.filter).connect(this.vol).connect(this.xf).connect(master);
+    this.filter.connect(this.echoSend).connect(this.echo).connect(this.fb).connect(this.echo); this.echo.connect(this.xf);
+  }
+  start(at, offset) {
+    this.stopSrc(at);
+    const s = ctx.createBufferSource(); s.buffer = buffers[this.track]; s.loop = true; s.connect(this.input);
+    s.start(at, offset); this.src = s; this.srcStart = at - offset;
+  }
+  stopSrc(at) { if (this.src) { try { this.src.stop(at ?? 0); } catch {} this.src = null; } }
+  play() {
+    if (!clockStart) clockStart = ctx.currentTime + 0.05;
+    const at = nextBar(); this.start(at, phaseAt(at)); this.playing = true; this.playedAt = at;
+  }
+  stop() { this.stopSrc(); this.playing = false; }
+  load(i) { this.track = i; if (this.playing) { const at = nextBar(); this.start(at, phaseAt(at)); } }
+  resync() { if (this.playing) { const at = ctx.currentTime + 0.01; this.start(at, phaseAt(at)); } }
+  setFilter(v) { // 0..1, 0.5 = off
+    const t = ctx.currentTime;
+    if (Math.abs(v - 0.5) < 0.04) { this.filter.type = 'allpass'; return; }
+    this.filter.type = v < 0.5 ? 'lowpass' : 'highpass';
+    const x = Math.abs(v - 0.5) * 2;
+    this.filter.frequency.setTargetAtTime(v < 0.5 ? 18000 * Math.pow(0.006, x) : 30 * Math.pow(150, x), t, 0.02);
+  }
+  kill(band) { this.kills[band] = !this.kills[band]; this[band].gain.setTargetAtTime(this.kills[band] ? -40 : 0, ctx.currentTime, 0.01); }
+}
+
+// --- game state ---
+let decks = [], xfVal = 0, score = 0, combo = 1, crowd = 0.15, lastSide = 'A', mixStart = 0, mixesDone = 0, perfects = 0;
+const missions = [
+  { text: 'Starte Deck A', done: () => decks[0].playing },
+  { text: 'Starte Deck B und schieb den Crossfader rüber', done: () => mixesDone >= 1 },
+  { text: 'Triff 3 Effekte perfekt auf den Beat', done: () => perfects >= 3 },
+  { text: 'Mix 3 verschiedene Tracks', done: () => new Set(playedTracks).size >= 3 },
+  { text: 'Bring die Crowd auf 80 %', done: () => crowd >= 0.8 },
+  { text: 'Freies Auflegen: hol dir den Highscore!', done: () => false },
+];
+let playedTracks = [];
+const pop = (txt, color) => { const d = document.createElement('div'); d.className = 'pop'; d.textContent = txt; d.style.color = color; document.body.append(d); setTimeout(() => d.remove(), 900); };
+const addScore = (pts, txt, color) => { score += Math.round(pts * combo); if (txt) pop(txt, color); crowd = Math.min(1, crowd + pts / 4000); };
+// grading how close a tap is to the beat grid
+function grade() {
+  if (!clockStart) return 'miss';
+  const ph = ((ctx.currentTime - clockStart) / BEAT) % 1, off = Math.min(ph, 1 - ph) * BEAT;
+  return off < 0.06 ? 'perfect' : off < 0.12 ? 'good' : 'miss';
+}
+function hit(kind) {
+  const g = grade();
+  if (g === 'perfect') { combo = Math.min(8, combo + 1); perfects++; addScore(150, `PERFECT ${kind}  x${combo}`, '#3ddc84'); }
+  else if (g === 'good') addScore(80, `GOOD ${kind}`, '#22d3ee');
+  else { combo = 1; pop('daneben', '#ff3b5c'); }
+}
+
+// --- UI ---
+function slider(el, value, onInput, def) {
+  const k = el.querySelector('.k');
+  const set = (v) => { k.style.left = `calc(${v * 100}% * (1 - 44/100/3) + 22px * ${1 - v})`; k.style.left = `calc(22px + ${v} * (100% - 44px))`; };
+  set(value);
+  const move = (e) => { const r = el.getBoundingClientRect(); const v = Math.max(0, Math.min(1, (e.clientX - r.left - 22) / (r.width - 44))); set(v); onInput(v); };
+  el.addEventListener('pointerdown', (e) => { el.setPointerCapture(e.pointerId); move(e); el.onpointermove = move; });
+  el.addEventListener('pointerup', () => { el.onpointermove = null; });
+  if (def != null) el.addEventListener('dblclick', () => { set(def); onInput(def); });
+  return set;
+}
+function buildDeck(d, el) {
+  el.innerHTML = `<h3><span>DECK ${d.side}</span><span class="tn"></span></h3>
+    <div class="tracks">${TRACKS.map((t, i) => `<button class="trk" data-i="${i}">${t[0]}</button>`).join('')}</div>
+    <div class="platter"><i></i><span>${d.side}</span></div>
+    <div class="ctrls">
+      <div class="row"><button class="btn play">▶ PLAY</button></div>
+      <div class="row"><button class="btn kill" data-b="low">LOW</button><button class="btn kill" data-b="mid">MID</button><button class="btn kill" data-b="high">HI</button></div>
+      <div class="slider flt"><div class="k"></div><small>FILTER</small></div>
+      <div class="pads"><button class="pad" data-fx="echo">ECHO</button><button class="pad" data-fx="roll">ROLL</button><button class="pad" data-fx="drop">DROP</button><button class="pad" data-fx="spin">SPIN</button></div>
+    </div>`;
+  d.el = el; d.arm = el.querySelector('.platter i');
+  el.querySelectorAll('.trk').forEach((b) => b.onclick = () => { d.load(+b.dataset.i); if (d.playing) { playedTracks.push(d.track); addScore(60); } render(); });
+  el.querySelector('.play').onclick = () => {
+    if (d.playing) d.stop(); else { d.play(); playedTracks.push(d.track); const g = grade(); if (g !== 'miss') addScore(100, 'ON THE ONE', '#22d3ee'); }
+    render();
+  };
+  el.querySelectorAll('.kill').forEach((b) => b.onclick = () => { d.kill(b.dataset.b); hit(b.dataset.b.toUpperCase()); render(); });
+  slider(el.querySelector('.flt'), 0.5, (v) => { d.setFilter(v); if (Math.abs(v - 0.5) > 0.35) crowd = Math.min(1, crowd + 0.002); }, 0.5);
+  el.querySelectorAll('.pad').forEach((p) => {
+    const fx = p.dataset.fx;
+    p.onpointerdown = () => {
+      if (!d.playing) return; p.classList.add('on'); hit(fx.toUpperCase()); const t = ctx.currentTime;
+      if (fx === 'echo') { d.echoSend.gain.setTargetAtTime(0.8, t, 0.01); d.fb.gain.setTargetAtTime(0.55, t, 0.01); }
+      if (fx === 'roll' && d.src) { const pos = (t - d.srcStart) % LOOP; const s = BEAT / 4; d.src.loopStart = Math.floor(pos / s) * s; d.src.loopEnd = d.src.loopStart + s; }
+      if (fx === 'drop') { d.low.gain.setTargetAtTime(-40, t, 0.01); d.vol.gain.setTargetAtTime(0.35, t, 0.02); }
+      if (fx === 'spin' && d.src) d.src.playbackRate.setTargetAtTime(0.25, t, 0.25);
+    };
+    p.onpointerup = p.onpointerleave = () => {
+      if (!p.classList.contains('on')) return; p.classList.remove('on'); const t = ctx.currentTime;
+      if (fx === 'echo') { d.echoSend.gain.setTargetAtTime(0, t, 0.02); d.fb.gain.setTargetAtTime(0.35, t, 0.05); setTimeout(() => d.fb.gain.setTargetAtTime(0, ctx.currentTime, 0.4), 1500); }
+      if (fx === 'roll' || fx === 'spin') d.resync();
+      if (fx === 'drop') { d.low.gain.setTargetAtTime(d.kills.low ? -40 : 0, t, 0.005); d.vol.gain.setTargetAtTime(1, t, 0.005); if (grade() !== 'miss') addScore(200, 'DROP!', '#ff9f1c'); }
+    };
+  });
+  // platter: hold = brake, swipe = scratch, release = back in sync
+  const pl = el.querySelector('.platter');
+  let lastA = 0, lastT = 0;
+  const ang = (e) => { const r = pl.getBoundingClientRect(); return Math.atan2(e.clientY - r.top - r.height / 2, e.clientX - r.left - r.width / 2); };
+  pl.onpointerdown = (e) => { if (!d.playing || !d.src) return; pl.setPointerCapture(e.pointerId); lastA = ang(e); lastT = performance.now(); d.scratching = true; d.src.playbackRate.setTargetAtTime(0.05, ctx.currentTime, 0.03); };
+  pl.onpointermove = (e) => {
+    if (!d.scratching || !d.src) return;
+    let a = ang(e), da = a - lastA; if (da > Math.PI) da -= 2 * Math.PI; if (da < -Math.PI) da += 2 * Math.PI;
+    const now = performance.now(), v = da / Math.max(1, now - lastT) * 1000 / (Math.PI * 2 * 0.55);
+    lastA = a; lastT = now; d.scratchAmt = (d.scratchAmt || 0) + Math.abs(da);
+    d.src.playbackRate.setTargetAtTime(Math.max(0.05, Math.min(3, Math.abs(v))), ctx.currentTime, 0.015);
+    d.vol.gain.setTargetAtTime(Math.min(1, Math.abs(v) * 1.5), ctx.currentTime, 0.01);
+  };
+  pl.onpointerup = () => {
+    if (!d.scratching) return; d.scratching = false; d.vol.gain.setTargetAtTime(1, ctx.currentTime, 0.01); d.resync();
+    if (d.scratchAmt > 6) addScore(120, 'SCRATCH!', '#a855f7'); d.scratchAmt = 0;
+  };
+}
+function setXf(v) {
+  xfVal = v; const t = ctx.currentTime;
+  decks[0].xf.gain.setTargetAtTime(Math.cos(v * Math.PI / 2), t, 0.01);
+  decks[1].xf.gain.setTargetAtTime(Math.sin(v * Math.PI / 2), t, 0.01);
+  const side = v < 0.15 ? 'A' : v > 0.85 ? 'B' : null;
+  if (side === null && !mixStart) mixStart = ctx.currentTime;
+  if (side && side !== lastSide) {
+    const beats = (ctx.currentTime - mixStart) / BEAT;
+    if (decks[0].playing && decks[1].playing) {
+      mixesDone++;
+      if (decks[0].track === decks[1].track) addScore(50, 'gleicher Track …', '#8a93a6');
+      else if (beats >= 4 && beats <= 64) { combo = Math.min(8, combo + 1); addScore(500, `SMOOTH MIX  x${combo}`, '#3ddc84'); }
+      else addScore(150, beats < 4 ? 'HARTER CUT' : 'LANGER MIX', '#22d3ee');
+    }
+    lastSide = side; mixStart = 0;
+  } else if (side) mixStart = 0;
+}
+function render() {
+  decks.forEach((d) => {
+    d.el.querySelectorAll('.trk').forEach((b) => b.classList.toggle('on', +b.dataset.i === d.track));
+    d.el.querySelector('.play').classList.toggle('on', d.playing);
+    d.el.querySelector('.play').textContent = d.playing ? '■ STOP' : '▶ PLAY';
+    d.el.querySelectorAll('.kill').forEach((b) => b.classList.toggle('on', !!d.kills[b.dataset.b]));
+    d.el.querySelector('.tn').textContent = TRACKS[d.track][0];
+  });
+}
+
+// crowd + meters
+const cv = document.getElementById('crowd'), g = cv.getContext('2d');
+const people = Array.from({ length: 70 }, () => ({ x: Math.random(), s: 0.6 + Math.random() * 0.6, p: Math.random() * 6, h: Math.random() * 360 }));
+const freq = new Uint8Array(64);
+function frame() {
+  requestAnimationFrame(frame);
+  const W = cv.width = cv.clientWidth * devicePixelRatio, H = cv.height = cv.clientHeight * devicePixelRatio;
+  g.clearRect(0, 0, W, H);
+  let bass = 0;
+  if (analyser) { analyser.getByteFrequencyData(freq); bass = (freq[1] + freq[2] + freq[3]) / 765; }
+  const beatPh = clockStart ? ((ctx.currentTime - clockStart) / BEAT) % 1 : 0;
+  const anyPlaying = decks.some((d) => d.playing);
+  // lights
+  for (let i = 0; i < 5; i++) {
+    const x = W * (0.1 + i * 0.2), a = anyPlaying ? 0.05 + bass * 0.25 * crowd : 0.02;
+    const grd = g.createLinearGradient(x, 0, x + Math.sin(performance.now() / 900 + i) * W * 0.2, H);
+    grd.addColorStop(0, `hsla(${(i * 70 + performance.now() / 40) % 360},90%,60%,${a})`); grd.addColorStop(1, 'transparent');
+    g.fillStyle = grd; g.fillRect(0, 0, W, H);
+  }
+  // crowd silhouettes jumping on the beat
+  for (const p of people) {
+    const jump = anyPlaying ? Math.max(0, Math.sin((beatPh + p.p) * Math.PI * 2)) * crowd * 0.08 * H : 0;
+    const x = p.x * W, y = H - jump, r = H * 0.035 * p.s;
+    g.fillStyle = `hsla(${p.h},40%,${12 + crowd * 25}%,0.9)`;
+    g.beginPath(); g.arc(x, y - r * 3.2, r, 0, 7); g.fill();
+    g.fillRect(x - r * 1.1, y - r * 2.2, r * 2.2, r * 2.4);
+    if (crowd > 0.5 && anyPlaying) { g.fillRect(x - r * 1.5, y - r * 4.4 - jump * 0.3, r * 0.5, r * 1.8); g.fillRect(x + r, y - r * 4.4 - jump * 0.3, r * 0.5, r * 1.8); }
+  }
+  if (ctx) {
+    crowd = Math.max(0.05, crowd - (anyPlaying ? 0.00025 : 0.002));
+    if (!decks.some((d) => d.playing && d.xf.gain.value > 0.2)) crowd = Math.max(0.05, crowd - 0.003);
+    decks.forEach((d) => { if (d.playing && clockStart) d.arm.style.transform = `rotate(${((ctx.currentTime - clockStart) / 1.8) * 360}deg)`; });
+    const beatNo = clockStart ? Math.floor((ctx.currentTime - clockStart) / BEAT) % 4 : -1;
+    document.querySelectorAll('#beats i').forEach((b, i) => b.classList.toggle('on', anyPlaying && i === beatNo));
+  }
+  document.getElementById('score').textContent = score.toLocaleString('de-DE');
+  document.getElementById('combo').textContent = `Crowd ${Math.round(crowd * 100)} %${combo > 1 ? `  ·  Combo x${combo}` : ''}`;
+  const m = missions.find((x) => !x.done());
+  document.getElementById('mission').innerHTML = `Mission: <b>${m.text}</b>`;
+  const best = +localStorage.getItem('pocket.best') || 0;
+  if (score > best) localStorage.setItem('pocket.best', score);
+}
+
+document.getElementById('go').onclick = async () => {
+  const btn = document.getElementById('go'); btn.textContent = 'Lade Tracks …'; btn.disabled = true;
+  ctx = new AudioContext({ latencyHint: 'interactive' });
+  comp = ctx.createDynamicsCompressor(); comp.threshold.value = -10; comp.ratio.value = 6;
+  master = ctx.createGain(); master.gain.value = 0.9; analyser = ctx.createAnalyser(); analyser.fftSize = 128;
+  master.connect(comp).connect(analyser).connect(ctx.destination);
+  await Promise.all(TRACKS.map(renderTrack));
+  decks = [new Deck(0, 'A'), new Deck(1, 'B')];
+  buildDeck(decks[0], document.getElementById('deckA')); buildDeck(decks[1], document.getElementById('deckB'));
+  slider(document.getElementById('xf'), 0, setXf, 0.5); setXf(0);
+  render(); document.getElementById('start').remove();
+};
+frame();
+</script>
+</body>
+</html>
