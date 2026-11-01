@@ -6,6 +6,7 @@ import { h, setText, setClass } from './controls.js';
 import OpenMusic, { proxied, openTrackId } from './openmusic.js';
 import { keyColor, camelotDistance, bpmDistance } from './library.js';
 import { DECK_COLORS } from './waveform.js';
+import { Catalog } from './catalog.js';
 
 const fmtLen = (s) => (s ? `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, '0')}` : '');
 
@@ -98,6 +99,8 @@ export class OnlinePanel {
     this.results = new Map();    // key -> result (for drag & drop)
     this.busy = new Map();       // result key -> progress
     this.preview = new Preview(this.app);
+    this.catalog = new Catalog();
+    this.catalog.load().then(() => this.active && this.render());
     this.preview.onChange = () => this.render();
     this.timer = 0;
     this.build();
@@ -118,9 +121,19 @@ export class OnlinePanel {
     this.el = h('section', { class: 'online' },
       h('div', { class: 'online-head' },
         h('b', {}, 'Freie Musik online'),
-        h('span', { class: 'online-sub' }, 'nur Creative Commons und gemeinfrei · Openverse/Jamendo · Internet Archive · ccMixter'),
+        h('span', { class: 'online-sub' }, 'nur Creative Commons und gemeinfrei · Open DJ Library · Openverse/Jamendo · Internet Archive · ccMixter'),
         h('div', { class: 'spacer' }), lic, match),
       this.genreBar, this.status, this.body);
+  }
+
+  // "Freie Musik" opened without a search: start with the DJ's main style
+  autoGenre() {
+    if (this.active || this.autoDone) return;
+    this.autoDone = true;
+    const fam2key = { house: 'house', techno: 'techno', trance: 'trance', bass: 'dnb', breaks: 'electro', urban: 'hiphop', downtempo: 'ambient', world: 'disco' };
+    const top = this.app.style.topGenres(1)[0];
+    const key = top && (OpenMusic.GENRES[top.id] ? top.id : fam2key[top.family]);
+    if (key && OpenMusic.GENRES[key]) { this.genre = key; this.run(); }
   }
 
   setQuery(q) {
@@ -182,7 +195,7 @@ export class OnlinePanel {
 
   known(r) {
     const t = this.app.library.tracks.get(openTrackId(r));
-    return { bpm: t?.bpm || r.bpm || 0, camelot: t?.camelot || '', track: t };
+    return { bpm: t?.bpm || r.bpm || 0, camelot: t?.camelot || r.camelot || '', track: t };
   }
 
   matches(r) {
@@ -211,6 +224,11 @@ export class OnlinePanel {
     d.loading = 0.02;
     try {
       const t = await a.library.openTrackFile(r, (p) => (d.loading = 0.02 + p * 0.25));
+      // catalog tracks bring BPM, grid and key: keep them instead of re-detecting
+      if (r.catalog && !(await a.library.getAnalysis(t))?.wave) {
+        const an = r.catalog.analysis;
+        await a.library.applyAnalysis(t, { bpm: an.bpm, beatOffset: an.beatOffset, key: an.key, rmsDb: an.rmsDb, duration: an.durationSec });
+      }
       await a.loadTrack(deck, t);
     } catch (e) {
       d.loading = 0;
@@ -298,6 +316,13 @@ export class OnlinePanel {
     if (b) b.textContent = `${Math.round((this.busy.get(k) || 0) * 100)}%`;
   }
 
+  // open-dj-library results come from a local copy of the catalog, so they are instant
+  catalogGroup() {
+    const c = this.catalog;
+    const results = c.loaded ? c.search({ query: this.query, genreLabel: OpenMusic.GENRES[this.genre]?.label || this.genre, license: this.license }) : [];
+    return { source: 'odl', label: 'Open DJ Library · BPM & Key fertig', ok: c.loaded || !c.error, error: c.error || (c.loaded ? '' : 'lädt …'), total: results.length, results };
+  }
+
   render() {
     this.genreBar.querySelectorAll('.chip').forEach((c) => setClass(c, 'on', c.dataset.g === this.genre));
     if (!this.active) {
@@ -305,11 +330,12 @@ export class OnlinePanel {
       this.body.replaceChildren();
       return;
     }
-    const total = this.groups.reduce((n, g) => n + (g.results?.length || 0), 0);
+    const groups = [this.catalogGroup(), ...this.groups];
+    const total = groups.reduce((n, g) => n + (g.results?.length || 0), 0);
     setText(this.status, this.loading ? 'Suche läuft …' : `${total} freie Treffer`);
     this.results.clear();
     const parts = [];
-    for (const g of this.groups) {
+    for (const g of groups) {
       const rows = (g.results || []).filter((r) => r.kind === 'album' || this.matches(r));
       parts.push(h('div', { class: 'ogroup' },
         h('span', {}, g.label || g.source),

@@ -433,3 +433,10 @@ a.oartist:hover { color: var(--text); text-decoration: underline; }
 .ctrl-state { font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 10px; background: #ffffff10; color: var(--muted); white-space: nowrap; }
 .ctrl-state.s-native, .ctrl-state.s-running { background: #3ddc8422; color: #3ddc84; }
 .ctrl-state.s-error { background: #ff3b5c22; color: #ff6b85; }
+
+/* ---------- genres ---------- */
+.genre-box { display: flex; flex-direction: column; gap: 1px; }
+.nav-item.fam .gdot, .c-genre .gdot { display: inline-block; width: 7px; height: 7px; border-radius: 50%; margin-right: 6px; vertical-align: middle; }
+.nav-item.gen { padding-left: 24px; font-size: 12px; }
+.nav-item .liked { color: #ff5fd2; }
+.c-genre.est { color: var(--dim); font-style: italic; }

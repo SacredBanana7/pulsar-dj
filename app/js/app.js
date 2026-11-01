@@ -6,6 +6,7 @@ import { Deck } from './deck.js';
 import { Library } from './library.js';
 import { Midi } from './midi.js';
 import { FX_TYPES } from './fx.js';
+import { StyleProfile } from './genres.js';
 
 const RANGES = [0.06, 0.08, 0.16, 0.5];
 
@@ -30,6 +31,9 @@ export class App {
     this.decks = [0, 1, 2, 3].map((i) => new Deck(this, i));
     this.decks.forEach((d) => (d.range = this.settings.defaultRange));
     this.library = new Library(this);
+    // learns the DJ's style from what gets played (genres, tempo, keys)
+    this.style = new StyleProfile();
+    this.style.load().then(() => this.ui?.dirty?.());
     this.midi = new Midi(this);
     this.masterIndex = null;
     this.padMode = ['hotcue', 'hotcue', 'hotcue', 'hotcue'];
@@ -126,7 +130,7 @@ export class App {
     switch (name) {
       case 'play':
         d.togglePlay();
-        if (d.playing && !d.playedMarked && d.track) { d.playedMarked = true; this.library.markPlayed(d.track); }
+        if (d.playing && !d.playedMarked && d.track) { d.playedMarked = true; this.library.markPlayed(d.track); this.style.learn(d.track, 1); }
         break;
       case 'stutter': d.seek(d.cuePoint); d.play(); break;
       case 'cueDown': d.cueDown(); break;

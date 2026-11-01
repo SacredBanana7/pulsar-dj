@@ -20,6 +20,7 @@ Pulsar läuft komplett lokal: Web Audio (AudioWorklet) für den Sound, Web MIDI 
   - MIDI-Learn für alles andere
 - **Offene Musik-Bibliothek:**
   - Lokale Ordner und legal freie Online-Musik in einer gemeinsamen Suche (Openverse/Jamendo, Internet Archive, ccMixter)
+  - Dazu [open-dj-library](https://github.com/SacredBanana7/open-dj-library): ein offener Katalog freier Tracks, bei dem BPM, Beatgrid und Tonart schon fertig analysiert sind
   - Lizenz und Urheber werden bei jedem Track angezeigt
   - Freie Tracks lassen sich offline speichern
 - **Offenes Library-Format:**

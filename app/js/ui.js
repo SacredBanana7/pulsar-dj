@@ -7,6 +7,7 @@ import { FX_TYPES, FxUnit } from './fx.js';
 import { keyColor, camelotDistance, bpmDistance } from './library.js';
 import { OnlinePanel, licenseBadge } from './ui-online.js';
 import LibFormat from './libformat.js';
+import { classify, TAXONOMY, GENRES } from './genres.js';
 
 const fmtTime = (s) => {
   if (!isFinite(s) || s < 0) s = 0;
@@ -391,6 +392,9 @@ export class UI {
         this.reconnectBtn),
       nav('all', 'Sammlung', h('span', { class: 'count' })),
       nav('online', h('span', {}, 'Freie Musik ', h('small', { class: 'sub' }, 'CC · online')), null),
+      nav('foryou', h('span', {}, 'Für dich ', h('small', { class: 'sub foryou-sub' })), null),
+      h('div', { class: 'nav-label' }, 'Genres'),
+      this.genreBox = h('div', { class: 'genre-box' }),
       nav('downloaded', 'Offline gespeichert', h('span', { class: 'sub dl-count' })),
       h('div', { class: 'nav-label' }, 'Passt zu …'),
       ...[0, 1, 2, 3].map((d) => nav(`match${d}`, h('span', {}, h('b', { style: { color: DECK_COLORS[d] } }, 'Deck ' + 'ABCD'[d])), h('span', { class: 'sub' }))),
@@ -481,6 +485,60 @@ export class UI {
     const pl = await this.app.library.createPlaylist(name, this.selected ? [this.selected] : []);
     this.libView = `pl:${pl.id}`;
     this.libDirty = true;
+  }
+
+  // genre per track, cached until the track's tags/bpm change
+  genreOf(t) {
+    const key = `${t.genre}|${(t.tags || []).join(',')}|${Math.round(t.bpm || 0)}`;
+    if (t._gk !== key) {
+      Object.defineProperty(t, '_g', { value: classify(t), writable: true, configurable: true, enumerable: false });
+      Object.defineProperty(t, '_gk', { value: key, writable: true, configurable: true, enumerable: false });
+    }
+    return t._g;
+  }
+
+  genreRank(t) {
+    const g = this.genreOf(t);
+    const fi = TAXONOMY.findIndex((f) => f.id === g.family);
+    const gi = fi >= 0 ? TAXONOMY[fi].genres.findIndex((x) => x.id === g.id) : 0;
+    return fi < 0 ? 999 : fi * 20 + gi;
+  }
+
+  // sidebar: families ordered by the learned style, genres with counts, only non-empty ones
+  renderGenres(collection) {
+    const st = this.app.style;
+    const counts = new Map();
+    for (const t of collection) {
+      const g = this.genreOf(t);
+      counts.set(g.id, (counts.get(g.id) || 0) + 1);
+      counts.set(`fam:${g.family}`, (counts.get(`fam:${g.family}`) || 0) + 1);
+    }
+    this.genreOpen = this.genreOpen || new Set();
+    const fams = [...st.familyOrder(), { id: 'unknown', label: 'Unsortiert', color: '#555b66', genres: [{ id: 'unknown', label: 'Unbekannt' }] }];
+    const items = [];
+    for (const f of fams) {
+      const n = counts.get(`fam:${f.id}`) || 0;
+      if (!n) continue;
+      const open = this.genreOpen.has(f.id) || this.libView === `fam:${f.id}` || f.genres.some((g) => this.libView === `gen:${g.id}`);
+      const liked = st.families[f.id] > 0;
+      items.push(h('button', { class: `nav-item fam${this.libView === `fam:${f.id}` ? ' on' : ''}`, onclick: () => {
+        open && this.libView === `fam:${f.id}` ? this.genreOpen.delete(f.id) : this.genreOpen.add(f.id);
+        this.libView = `fam:${f.id}`; this.libDirty = true; this.scrollTop();
+      } },
+      h('span', {}, h('i', { class: 'gdot', style: { background: f.color } }), f.label, liked ? h('small', { class: 'liked', title: 'gehört zu deinem Stil' }, ' ♥') : null),
+      h('span', { class: 'count' }, String(n))));
+      if (!open) continue;
+      for (const g of f.genres) {
+        const c = counts.get(g.id) || 0;
+        if (!c) continue;
+        items.push(h('button', { class: `nav-item gen${this.libView === `gen:${g.id}` ? ' on' : ''}`, onclick: () => { this.libView = `gen:${g.id}`; this.libDirty = true; this.scrollTop(); } },
+          h('span', {}, g.label), h('span', { class: 'count' }, String(c))));
+      }
+    }
+    if (!items.length) items.push(h('div', { class: 'root muted' }, 'erscheinen, sobald Tracks da sind'));
+    this.genreBox.replaceChildren(...items);
+    const top = st.topGenres(2);
+    setText(this.navItems.foryou.querySelector('.foryou-sub'), top.length ? top.map((g) => g.label).join(', ') : 'lernt beim Auflegen');
   }
 
   renderPlaylists() {
@@ -815,20 +873,32 @@ export class UI {
     else if (v === 'downloaded') rows = [...lib.tracks.values()].filter((t) => !t.transient && lib.isDownloaded?.(t));
     else if (v.startsWith('pl:')) rows = lib.playlistTracks(v.slice(3));
     else if (v === 'online') rows = [];
+    else if (v === 'foryou') {
+      // the collection ranked by how well it fits the learned style, least played first
+      const st = this.app.style;
+      rows = [...lib.tracks.values()].filter((t) => !t.transient)
+        .map((t) => [t, st.affinity(t) - Math.min(0.3, (t.plays || 0) * 0.05)])
+        .sort((a, b) => b[1] - a[1]).map(([t]) => t);
+    } else if (v.startsWith('fam:') || v.startsWith('gen:')) {
+      const id = v.slice(4);
+      rows = [...lib.tracks.values()].filter((t) => !t.transient && (v.startsWith('fam:') ? this.genreOf(t).family === id : this.genreOf(t).id === id));
+    }
     else rows = [...lib.tracks.values()].filter((t) => !t.transient);
     const q = this.search.trim().toLowerCase();
     if (q) {
       const terms = q.split(/\s+/);
       rows = rows.filter((t) => {
-        const hay = `${t.title} ${t.artist} ${t.album} ${t.genre} ${t.camelot} ${t.keyName} ${Math.round(t.bpm)}`.toLowerCase();
+        const hay = `${t.title} ${t.artist} ${t.album} ${t.genre} ${this.genreOf(t).label} ${this.genreOf(t).familyLabel} ${t.camelot} ${t.keyName} ${Math.round(t.bpm)}`.toLowerCase();
         return terms.every((x) => hay.includes(x));
       });
     }
-    if (!v.startsWith('match') && v !== 'history' && !v.startsWith('pl:')) {
+    if (!v.startsWith('match') && v !== 'history' && !v.startsWith('pl:') && v !== 'foryou') {
       const { key, dir } = this.sort;
       const val = (t) => {
         const x = t[key];
         if (key === 'camelot') { const m = /^(\d+)([AB])$/.exec(x || ''); return m ? Number(m[1]) * 2 + (m[2] === 'B' ? 1 : 0) : 99; }
+        // genre: taxonomy order (family, then genre), then tempo inside the genre
+        if (key === 'genre') return this.genreRank(t) * 1000 + (t.bpm || 0);
         return typeof x === 'string' ? x.toLowerCase() : x || 0;
       };
       rows.sort((a, b) => (val(a) > val(b) ? dir : val(a) < val(b) ? -dir : 0));
@@ -850,7 +920,9 @@ export class UI {
     this.localEl.classList.toggle('hidden', onlineView);
     this.online.el.classList.toggle('hidden', !showOnline);
     this.online.el.classList.toggle('full', onlineView);
+    if (onlineView) this.online.autoGenre();
     this.renderPlaylists();
+    this.renderGenres(collection);
     setText(this.navItems.downloaded.querySelector('.dl-count'), String(collection.filter((t) => lib.isDownloaded?.(t)).length || ''));
     Object.entries(this.navItems).forEach(([id, el]) => el.classList.toggle('on', id === this.libView));
     setText(this.navItems.all.querySelector('.count'), String(total));
@@ -873,7 +945,11 @@ export class UI {
       this.analyzeBtn.disabled = !pending;
     }
     const pl = this.libView.startsWith('pl:') ? lib.playlists.find((p) => p.id === this.libView.slice(3)) : null;
-    const viewName = this.libView.startsWith('match') ? `Passend zu Deck ${'ABCD'[Number(this.libView.slice(5))]} (Key + BPM)`
+    const gv = this.libView.startsWith('gen:') ? GENRES.get(this.libView.slice(4)) : null;
+    const fv = this.libView.startsWith('fam:') ? TAXONOMY.find((f) => f.id === this.libView.slice(4)) : null;
+    const viewName = gv ? `Genre ${gv.label} (${gv.bpm[0]}–${gv.bpm[1]} BPM typisch)` : fv ? `${fv.label} · sortiert nach Genre und Tempo`
+      : this.libView === 'foryou' ? (this.app.style.empty ? 'Für dich: lernt aus dem, was du auflegst' : `Für dich: passt zu deinem Stil (${this.app.style.topGenres(3).map((g) => g.label).join(', ')})`)
+      : this.libView.startsWith('match') ? `Passend zu Deck ${'ABCD'[Number(this.libView.slice(5))]} (Key + BPM)`
       : pl ? `Playlist „${pl.name}“ · Entf entfernt den markierten Track` : onlineView ? 'Freie Musik' : '';
     setText(this.libInfo, `${this.rows.length} Tracks${viewName ? ' · ' + viewName : ''}${lib.scanning ? ' · lese Ordner …' : ''}`);
     this.listInner.style.height = `${this.rows.length * ROW_H}px`;
@@ -921,7 +997,11 @@ export class UI {
     h('div', { class: `c c-bpm${good ? ' good' : ''}` }, t.bpm ? t.bpm.toFixed(1) : ''),
     h('div', { class: 'c c-camelot' }, t.camelot ? h('span', { class: `key-badge${kd <= 1 ? ' match' : ''}`, style: { '--k': keyColor(t.camelot) } }, t.camelot) : (t.tagKey || '')),
     h('div', { class: 'c c-duration' }, fmtLen(t.duration)),
-    h('div', { class: 'c c-genre' }, t.genre),
+    (() => {
+      const g = this.genreOf(t);
+      return h('div', { class: `c c-genre${g.estimated ? ' est' : ''}`, title: g.estimated ? `geschätzt aus dem Tempo${t.genre ? ` (Tag: ${t.genre})` : ''}` : `${g.familyLabel}${t.genre && t.genre !== g.label ? ` · Tag: ${t.genre}` : ''}` },
+        h('i', { class: 'gdot', style: { background: g.color } }), g.estimated && g.id !== 'unknown' ? `~${g.label}` : g.label);
+    })(),
     h('div', { class: 'c c-plays' }, t.plays ? String(t.plays) : ''));
     return el;
   }
