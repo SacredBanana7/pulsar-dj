@@ -3,7 +3,7 @@
 import { h, setText, setClass, setStyle, Knob, Fader } from './controls.js';
 import { ScrollingWave, Overview, drawPhase, DECK_COLORS } from './waveform.js';
 import { HOTCUE_COLORS, ROLL_BEATS, LOOP_BEATS, JUMP_BEATS } from './deck.js';
-import { FX_TYPES, FxUnit } from './fx.js';
+import { FX_TYPES, FX_GROUPS, FxUnit } from './fx.js';
 import { keyColor, camelotDistance, bpmDistance } from './library.js';
 import { OnlinePanel, licenseBadge } from './ui-online.js';
 import LibFormat from './libformat.js';
@@ -28,6 +28,8 @@ const PAD_LABELS = {
 };
 const PAD_MODES = [['hotcue', 'Hot Cue'], ['roll', 'Roll'], ['loop', 'Loop'], ['jump', 'Jump']];
 const ROW_H = 30;
+// Screen order of the decks, like the channels of a 4-channel mixer: C A | B D
+const DECK_ORDER = [2, 0, 1, 3];
 
 export class UI {
   constructor(app, root) {
@@ -57,7 +59,8 @@ export class UI {
     this.toastBox = h('div', { class: 'toasts' });
     this.topbar = this.buildTopbar();
     this.waveArea = h('section', { class: 'waves' });
-    for (let i = 0; i < 4; i++) this.waveArea.append(this.buildWaveRow(i));
+    const waveRows = [0, 1, 2, 3].map((i) => this.buildWaveRow(i));
+    this.waveArea.append(...DECK_ORDER.map((i) => waveRows[i]));
     this.fxBar = this.buildFx();
     const left = h('div', { class: 'deck-side left' });
     const right = h('div', { class: 'deck-side right' });
@@ -198,7 +201,7 @@ export class UI {
     r.ov = new Overview(r.overview, d, (sec) => a.act('seek', i, sec));
 
     // deck switch (4-deck mode)
-    const pair = i % 2 === 0 ? [0, 2] : [1, 3];
+    const pair = i % 2 === 0 ? [2, 0] : [1, 3];
     r.switch = h('div', { class: 'deck-switch' }, pair.map((k) =>
       h('button', { class: `sw sw-${k}`, style: { '--deck': DECK_COLORS[k] }, onclick: () => { a.focus[i % 2] = k; this.layout(); } }, 'ABCD'[k])));
 
@@ -335,8 +338,8 @@ export class UI {
         s.xf);
       s.el = el;
       this.strips.push(s);
-      channels.append(el);
     }
+    channels.append(...DECK_ORDER.map((i) => this.strips[i].el));
     this.xfader = new Fader({ value: 0.5, def: 0.5, horizontal: true, cls: 'xfader', onInput: (v) => a.act('xfader', 0, v), learn: { action: 'xfader', target: 0 } });
     this.masterKnob = new Knob({ label: 'MASTER', value: a.engine.masterVol, def: 0.8, bipolar: false, color: 'var(--text)', onInput: (v) => a.act('masterVol', 0, v), learn: { action: 'masterVol', target: 0 } });
     this.headMixKnob = new Knob({ label: 'CUE/MST', value: 0, def: 0.5, bipolar: false, color: 'var(--cue)', onInput: (v) => a.act('headMix', 0, v), learn: { action: 'headMix', target: 0 } });
@@ -354,7 +357,8 @@ export class UI {
       const r = { slots: [] };
       u.slots.forEach((s, si) => {
         const sel = h('select', { class: 'fx-type', onchange: (e) => a.act('fxType', ui, si, e.target.value) },
-          Object.entries(FX_TYPES).map(([k, v]) => h('option', { value: k, selected: k === s.type }, v)));
+          Object.entries(FX_GROUPS).map(([group, types]) => h('optgroup', { label: group },
+            types.map((k) => h('option', { value: k, selected: k === s.type }, FX_TYPES[k])))));
         const knob = new Knob({ value: s.level, def: 0.5, bipolar: false, size: 's', color: 'var(--fx)', onInput: (v) => a.act('fxLevel', ui, si, v), learn: { action: 'fxLevel', target: ui, arg: si } });
         const on = h('button', { class: 'btn tiny fx-on', onclick: () => a.act('fxSlot', ui, si), learn: { action: 'fxSlot', target: ui, arg: si } }, 'ON');
         r.slots.push({ sel, knob, on });
@@ -363,7 +367,7 @@ export class UI {
       r.assign = [0, 1, 2, 3].map((d) => h('button', { class: `fx-assign deck-${d}`, style: { '--deck': DECK_COLORS[d] }, onclick: () => a.act('fxAssign', ui, d), learn: { action: 'fxAssign', target: ui, arg: d } }, 'ABCD'[d]));
       r.el = h('div', { class: 'fx-unit' },
         h('div', { class: 'fx-name' }, `FX ${ui + 1}`),
-        h('div', { class: 'fx-assigns' }, r.assign),
+        h('div', { class: 'fx-assigns' }, DECK_ORDER.map((d) => r.assign[d])),
         r.slots.map((s) => h('div', { class: 'fx-slot' }, s.sel, s.knob.el, s.on)),
         h('div', { class: 'fx-beat-box' },
           h('button', { class: 'btn tiny', onclick: () => a.act('fxBeats', ui, -1) }, '−'),
@@ -398,7 +402,7 @@ export class UI {
       this.genreBox = h('div', { class: 'genre-box' }),
       nav('downloaded', 'Offline gespeichert', h('span', { class: 'sub dl-count' })),
       h('div', { class: 'nav-label' }, 'Passt zu …'),
-      ...[0, 1, 2, 3].map((d) => nav(`match${d}`, h('span', {}, h('b', { style: { color: DECK_COLORS[d] } }, 'Deck ' + 'ABCD'[d])), h('span', { class: 'sub' }))),
+      ...DECK_ORDER.map((d) => nav(`match${d}`, h('span', {}, h('b', { style: { color: DECK_COLORS[d] } }, 'Deck ' + 'ABCD'[d])), h('span', { class: 'sub' }))),
       h('div', { class: 'nav-label nav-pl' }, 'Playlists', h('button', { class: 'nav-add', title: 'Neue Playlist', onclick: () => this.newPlaylist() }, '+')),
       this.plBox = h('div', { class: 'pl-box' }),
       h('div', { class: 'nav-label' }, 'Sitzung'),

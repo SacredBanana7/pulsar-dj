@@ -11,7 +11,7 @@ Pulsar läuft komplett lokal: Web Audio (AudioWorklet) für den Sound, Web MIDI 
 - **Analyse** von BPM, Beatgrid mit Takt-Eins und Tonart (Camelot), farbige 3-Band-Waveform und Auto-Gain. Das Beatgrid lässt sich korrigieren (÷2, ×2, verschieben, Tap)
 - **Sync** mit Phasenabgleich, Half-/Double-Time und Soft-Takeover am Tempo-Fader
 - **Mixer:** 3-Band-Isolator-EQ mit Kill, Ein-Knopf-Filter, Gain, Crossfader mit einstellbarer Kurve, Limiter, Vorhören auf Kanal 3/4 (z. B. Controller-Soundkarten) oder Split-Cue
-- **Effekte:** 2 FX-Units mit je 3 Plätzen (Echo, Reverb, Flanger, Phaser, Bitcrush, Trans-Gate, Riser), beat-synchron
+- **Effekte:** 2 FX-Units mit je 3 Plätzen und 22 Effekten (Echo, Ping-Pong, Tape-Echo, Echo-Out, Reverb, Wash-Out, Flanger, Phaser, Chorus, Auto-Pan, Ring-Mod, Tiefpass, Hochpass, Filter-LFO, Trans-Gate, Pump, Slicer, Stutter, Bitcrush, Overdrive, Lo-Fi Vinyl, Riser), beat-synchron; die Rhythmus-Effekte rasten aufs Beatgrid ein
 - **Harmonic Mixing:** „Passt zu Deck X“ schlägt Tracks nach Tonart und Tempo vor
 - **Mix-Aufnahme** als Datei
 - **Controller:**

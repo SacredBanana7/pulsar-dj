@@ -116,7 +116,7 @@ button, select, input { font: inherit; color: inherit; }
 .phase { position: absolute; left: 50%; bottom: 0; width: 160px; height: 4px; transform: translateX(-50%); opacity: .9; }
 
 /* ---------- FX ---------- */
-.fx-bar { display: grid; grid-template-columns: 1fr 8px 1fr; }
+.fx-bar { display: grid; grid-template-columns: minmax(0, 1fr) 8px minmax(0, 1fr); }
 .fx-unit { display: flex; align-items: center; gap: 10px; padding: 5px 10px; background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); }
 .fx-name { font-weight: 800; color: var(--fx); letter-spacing: .08em; font-size: 12px; }
 .fx-assigns { display: flex; gap: 3px; }
@@ -348,9 +348,17 @@ kbd { background: var(--panel-3); border: 1px solid var(--line-2); border-bottom
   .transport { width: 118px; }
   #app { grid-template-rows: 46px auto auto clamp(270px, 40vh, 360px) minmax(130px, 1fr); }
 }
+@media (max-width: 1680px) {
+  .fx-unit { gap: 6px; padding: 5px 6px; }
+  .fx-slot { gap: 4px; padding-left: 6px; }
+  .fx-type { width: 74px; font-size: 11px; padding: 3px 2px; }
+  .fx-beat-box { gap: 3px; }
+  .fx-beats { min-width: 24px; }
+}
 @media (max-width: 1400px) {
   .grid-menu { display: none; }
-  .fx-type { width: 76px; }
+  .fx-type { width: 58px; }
+  .fx-assign { width: 18px; }
   .strip { width: 54px; }
 }
 
