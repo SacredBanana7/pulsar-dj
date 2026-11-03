@@ -220,9 +220,7 @@ export function drawPhase(canvas, deck, master) {
   g.fillStyle = 'rgba(255,255,255,0.25)';
   g.fillRect(w / 2 - 1, 0, 2, h);
   if (!deck.loaded || !deck.bpm || !master || master === deck || !master.bpm || !master.loaded) return;
-  const mb = master.beatAt(master.position), db = deck.beatAt(deck.position);
-  let diff = (db - Math.floor(db)) - (mb - Math.floor(mb));
-  diff -= Math.round(diff);
+  const diff = -deck.phaseTo(master).diff;
   const x = w / 2 + diff * w;
   const ok = Math.abs(diff) < 0.03;
   g.fillStyle = ok ? '#3ddc84' : DECK_COLORS[deck.index];

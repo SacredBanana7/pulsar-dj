@@ -36,6 +36,7 @@ export class App {
     this.style.load().then(() => this.ui?.dirty?.());
     this.midi = new Midi(this);
     this.masterIndex = null;
+    this.leaderIndex = null;
     this.padMode = ['hotcue', 'hotcue', 'hotcue', 'hotcue'];
     this.focus = [0, 1];               // which deck each side shows (A/C, B/D)
     this.selected = null;              // selected library track
@@ -74,14 +75,29 @@ export class App {
 
   toast(msg, kind = 'info') { this.ui?.toast(msg, kind); }
 
-  masterFor(deck) {
-    const pick = (d) => d && d !== deck && d.loaded && d.bpm;
-    if (this.masterIndex != null && pick(this.decks[this.masterIndex])) return this.decks[this.masterIndex];
-    const playing = this.decks.filter((d) => pick(d) && d.playing);
+  // Other decks with a tempo, best sync source first: playing, not synced, loudest.
+  syncCandidates(deck) {
     const audible = (d) => d.mix.volume * (d.mix.xfAssign === 'THRU' ? 1 : this.engine.xfGains()[d.mix.xfAssign === 'A' ? 0 : 1]);
-    playing.sort((a, b) => (a.sync - b.sync) || (audible(b) - audible(a)));
-    if (playing.length) return playing[0];
-    return this.decks.find((d) => pick(d) && !d.sync) || null;
+    return this.decks.filter((d) => d !== deck && d.loaded && d.bpm)
+      .sort((a, b) => (b.playing - a.playing) || (a.sync - b.sync) || (audible(b) - audible(a)));
+  }
+
+  // The one deck sync follows. It keeps the role while it plays, so moving a fader or
+  // syncing a second deck can't change the tempo of what is on air, and decks can't follow each other.
+  get leader() {
+    const usable = (d) => d && d.loaded && d.bpm;
+    if (usable(this.decks[this.masterIndex])) return this.decks[this.masterIndex];
+    const cur = this.decks[this.leaderIndex];
+    if (usable(cur) && cur.playing) return cur;
+    const [best] = this.syncCandidates(null);
+    const next = best?.playing || !usable(cur) ? best : cur;
+    this.leaderIndex = next ? next.index : null;
+    return next || null;
+  }
+
+  masterFor(deck) {
+    const l = this.leader;
+    return l && l !== deck ? l : deck ? this.syncCandidates(deck)[0] || null : l;
   }
 
   get clockBpm() {
@@ -273,8 +289,8 @@ export class App {
         if (!this.started) break;
         e.recorder ? e.stopRecording() : e.startRecording();
         break;
-      case 'gridHalf': this.editGrid(d, (i) => ({ ...i, bpm: i.bpm / 2 })); break;
-      case 'gridDouble': this.editGrid(d, (i) => ({ ...i, bpm: i.bpm * 2 })); break;
+      case 'gridHalf': this.scaleGrid(d, 0.5); break;
+      case 'gridDouble': this.scaleGrid(d, 2); break;
       case 'gridHere': this.editGrid(d, (i) => {
         const beat = 60 / i.bpm;
         let off = d.position;
@@ -282,7 +298,7 @@ export class App {
         return { ...i, beatOffset: off };
       }); break;
       case 'gridNudge': this.editGrid(d, (i) => ({ ...i, beatOffset: i.beatOffset + a })); break;
-      case 'gridBpm': this.editGrid(d, (i) => ({ ...i, bpm: a })); break;
+      case 'gridBpm': this.editGrid(d, (i) => ({ ...i, bpm: a, gridEdited: true })); break;
     }
     this.ui?.dirty();
   }
@@ -293,8 +309,17 @@ export class App {
   }
 
   editGrid(d, fn) {
-    if (!d?.info || !d.info.bpm) return;
+    if (!d?.info) return;
     d.info = fn(d.info);
     this.library.updateGrid(d.track, d.info);
+  }
+
+  scaleGrid(d, factor) {
+    if (!d?.info) return;
+    if (!d.bpm) { this.toast(`Deck ${d.name}: kein Tempo erkannt. Mit TAP eintippen.`, 'warn'); return; }
+    const bpm = d.bpm * factor;
+    if (bpm < 30 || bpm > 320) { this.toast(`Deck ${d.name}: ${bpm.toFixed(1)} BPM ist kein sinnvolles Tempo.`, 'warn'); return; }
+    this.editGrid(d, (i) => ({ ...i, bpm, gridEdited: true }));
+    this.toast(`Deck ${d.name}: Grid auf ${bpm.toFixed(1)} BPM`);
   }
 }

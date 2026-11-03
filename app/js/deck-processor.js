@@ -8,6 +8,7 @@ const SEEK = 384;             // WSOLA search tolerance (frames)
 const CMP = 512;              // correlation window
 const SCRATCH_FOLLOW = 640;   // frames the platter target is chased over
 const REPORT_EVERY = 3;       // blocks between position reports
+const UNITY_SPEED = 0.003;    // this close to speed 1, key lock has nothing to correct
 
 const HANN = new Float32Array(GRAIN);
 for (let i = 0; i < GRAIN; i++) HANN[i] = 0.5 - 0.5 * Math.cos((2 * Math.PI * i) / GRAIN);
@@ -42,6 +43,7 @@ class DeckProcessor extends AudioWorkletProcessor {
     this.ola = new Float32Array(GRAIN * 2);   // interleaved-free: L in [0,GRAIN), R in [GRAIN,2*GRAIN)
     this.olaIdx = HOP;
     this.prevGrain = -1;
+    this.settled = 0;         // grains in a row placed on the playhead
     this.stretching = false;
     this.port.onmessage = (e) => this.onMessage(e.data);
   }
@@ -109,6 +111,7 @@ class DeckProcessor extends AudioWorkletProcessor {
     this.ola.fill(0);
     this.olaIdx = HOP;
     this.prevGrain = -1;
+    this.settled = 0;
   }
 
   report(force) {
@@ -158,21 +161,34 @@ class DeckProcessor extends AudioWorkletProcessor {
       }
     };
     const c0 = Math.round(center);
+    scan(c0, c0, 1, 4);   // silence scores the same everywhere: stay on time then
     scan(c0 - SEEK, c0 + SEEK, 8, 4);
     const coarse = best;
     scan(coarse - 7, coarse + 7, 1, 2);
     return best;
   }
 
-  // Add the next keylocked grain into the overlap-add buffer.
+  // Add the next keylocked grain into the overlap-add buffer. Grains start at the playhead so
+  // the output sits on the reported position; a stretched deck stays on the beat that way.
   pushGrain() {
+    // the overlap needs a grain before the first one, or the output would fade in
+    if (this.prevGrain < 0) this.addGrain(Math.round(this.pos) - HOP);
+    // a grain plays at speed 1 while the playhead moves at vel: they meet at the grain's peak
+    const center = this.pos + HOP * (this.vel - 1);
+    // close to speed 1 the stretcher hands back to plain playback, so it has to end up on the playhead
+    const unity = Math.abs(this.vel - 1) <= UNITY_SPEED;
+    this.addGrain(unity ? Math.round(center) : this.bestGrain(center));
+    this.settled = unity ? this.settled + 1 : 0;
+    this.olaIdx = 0;
+  }
+
+  addGrain(start) {
     const ola = this.ola;
     // shift by HOP
     ola.copyWithin(0, HOP, GRAIN);
     ola.fill(0, GRAIN - HOP, GRAIN);
     ola.copyWithin(GRAIN, GRAIN + HOP, GRAIN * 2);
     ola.fill(0, GRAIN * 2 - HOP, GRAIN * 2);
-    const start = this.bestGrain(this.pos - GRAIN / 2);
     const L = this.L, R = this.R, len = this.len;
     for (let k = 0; k < GRAIN; k++) {
       const i = start + k;
@@ -182,7 +198,6 @@ class DeckProcessor extends AudioWorkletProcessor {
       ola[GRAIN + k] += R[i] * w;
     }
     this.prevGrain = start;
-    this.olaIdx = 0;
   }
 
   targetVelocity() {
@@ -233,9 +248,9 @@ class DeckProcessor extends AudioWorkletProcessor {
     const slipVel = this.playing ? this.tempo * (1 + this.bend) : 0;
 
     const stretch = this.keylock && !this.scratching && v0 > 0.05 && v1 > 0.05 &&
-      (Math.abs(v1 - 1) > 0.003 || this.stretching);
+      (Math.abs(v1 - 1) > UNITY_SPEED || this.stretching);
     if (stretch && !this.stretching) this.resetStretch();
-    this.stretching = stretch && Math.abs(v1 - 1) > 0.003;
+    this.stretching = stretch && (Math.abs(v1 - 1) > UNITY_SPEED || this.settled < 2);
 
     const L = this.L, R = this.R;
     let peak = this.peak;

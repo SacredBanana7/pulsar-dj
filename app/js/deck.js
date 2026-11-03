@@ -5,6 +5,8 @@ export const HOTCUE_COLORS = ['#ff3b5c', '#ff9f1c', '#ffe14d', '#3ddc84', '#22d3
 export const ROLL_BEATS = [1 / 16, 1 / 8, 1 / 4, 1 / 2, 1, 2, 4, 8];
 export const LOOP_BEATS = [1 / 4, 1 / 2, 1, 2, 4, 8, 16, 32];
 export const JUMP_BEATS = [-1, 1, -4, 4, -8, 8, -16, 16];
+const PHASE_SNAP = 0.12;         // beats of error too big to bend away
+const PHASE_SNAP_AFTER = 0.15;   // seconds it has to last before seeking
 
 export class Deck {
   constructor(app, index) {
@@ -43,6 +45,7 @@ export class Deck {
     this.jogTouched = false;
     this.bendTimer = 0;
     this.phaseBend = 0;
+    this.phaseOffSince = 0;
     this.manualBend = 0;
     // mixer
     this.mix = { trim: 0.5, high: 0.5, mid: 0.5, low: 0.5, filter: 0.5, volume: index < 2 ? 1 : 0, cue: false, xfAssign: index % 2 === 0 ? 'A' : 'B' };
@@ -109,6 +112,11 @@ export class Deck {
     this.seek(this.cuePoint);
     this.autoGainDb = info ? Math.max(-12, Math.min(12, -12 - info.rmsDb)) : 0;
     this.loop = { on: false, start: 0, end: 0, beats: 4, roll: false };
+    // a pitch that sync forced on the last track means nothing for this one
+    if (this.sync || this.pickup) {
+      this.pitch = this.pitchFader * this.range;
+      this.pickup = false;
+    }
     this.sync = false;
     this.reverse = false;
     this.applyTempo();
@@ -135,7 +143,7 @@ export class Deck {
 
   play() {
     if (!this.loaded) return;
-    if (this.sync) this.syncPhase(true);
+    if (this.sync && this.app.leader !== this) this.syncPhase(true);
     this.send({ type: 'play' });
     this.playing = true;
   }
@@ -324,10 +332,11 @@ export class Deck {
     const p = v * this.range;
     const last = this.pitchFader * this.range;
     this.pitchFader = v;
-    if (this.sync) return;
+    if (this.sync && this.app.leader !== this) return;
     if (this.pickup) {
       const crossed = Math.abs(p - this.pitch) < 0.004 || Math.sign(p - this.pitch) !== Math.sign(last - this.pitch);
-      if (!crossed) return;
+      // sync can leave the pitch outside the fader's range, where it could never be crossed
+      if (!crossed && Math.abs(this.pitch) <= this.range) return;
       this.pickup = false;
     }
     this.pitch = p;
@@ -370,44 +379,89 @@ export class Deck {
       this.pickup = true;
       return;
     }
-    const m = this.app.masterFor(this);
-    if (!m || !this.bpm || !m.bpm) return;
+    if (!this.bpm) return;
+    const app = this.app;
+    if (app.leader === this) {
+      const other = app.masterFor(this);
+      if (!other) return;
+      // the leader keeps its tempo unless another deck can take over without moving what is on air
+      if (other.sync || app.masterIndex === this.index || !(other.playing || !this.playing)) {
+        this.sync = true;
+        return;
+      }
+      app.leaderIndex = other.index;
+    }
+    const m = app.leader;
+    if (!m || m === this) return;
     this.sync = true;
     this.followMaster(m);
-    this.syncPhase(true);
+    this.syncPhase(true, m);
+  }
+
+  // Playback rate that puts this deck on the master's tempo. Detected tempos can be off by an
+  // octave, so the nearest octave wins; a grid set by hand is taken at its word within reason,
+  // which is what lets ÷2 and ×2 correct a wrong match.
+  syncRatio(m) {
+    const r = m.liveBpm / this.bpm;
+    if (this.info.gridEdited && r > 0.6 && r < 1.67) return r;
+    return r / 2 ** Math.round(Math.log2(r));
   }
 
   followMaster(m) {
-    let target = m.liveBpm / this.bpm;
-    // allow half/double time matching
-    if (target > 1.5) target /= 2;
-    else if (target < 0.66) target *= 2;
-    const p = target - 1;
+    const p = this.syncRatio(m) - 1;
     if (Math.abs(p - this.pitch) > 1e-5) {
       this.pitch = p;
+      this.pickup = true;
       this.applyTempo();
     }
   }
 
-  // Align beat phase to the master; `snap` seeks, otherwise gentle bend.
-  syncPhase(snap) {
-    const m = this.app.masterFor(this);
-    if (!m || !m.playing || !this.bpm || !m.bpm) return;
-    const ratio = this.bpm * this.rate / (m.bpm * m.rate);
-    const mb = m.beatAt(m.position);
-    const tb = this.beatAt(this.position);
-    const mPhase = mb * (ratio > 1.5 ? 2 : ratio < 0.66 ? 0.5 : 1);
-    let diff = (mPhase - Math.floor(mPhase)) - (tb - Math.floor(tb));
+  // Beat error to the master, measured on the finer of the two grids: a half-time grid
+  // lands on a real beat either way, so one beat of difference is no error.
+  phaseTo(m) {
+    const k = 2 ** Math.round(Math.log2(this.liveBpm / m.liveBpm));
+    const fine = Math.max(1, 1 / k);
+    let diff = (m.beatAt(m.position) * k - this.beatAt(this.position)) * fine;
     diff -= Math.round(diff);
+    return { diff, unitSec: this.trackBeatSec() / fine };
+  }
+
+  // False while the playhead is not following the grid, so its phase says nothing.
+  get phaseSteady() {
+    const b = this.loop.beats;
+    return this.playing && !this.jogTouched && !this.reverse && !this.manualBend && this.rep.vel > 0.05
+      && !(this.loop.on && Math.abs(b - Math.round(b)) > 0.01);
+  }
+
+  clearPhaseBend() {
+    this.phaseOffSince = 0;
+    if (!this.phaseBend) return;
+    this.phaseBend = 0;
+    this.send({ type: 'bend', value: this.manualBend });
+  }
+
+  // Align beat phase to the master; `snap` seeks, otherwise gentle bend. An error too big to
+  // bend away in time (the master jumped) seeks too, once it has lasted: a seek's old position
+  // can still come in from the worklet for a moment.
+  syncPhase(snap, m = this.app.masterFor(this)) {
+    if (!m || !m.playing || !this.bpm || !m.bpm) return this.clearPhaseBend();
+    const { diff, unitSec } = this.phaseTo(m);
+    const now = this.ctx.currentTime;
+    if (!snap && Math.abs(diff) > PHASE_SNAP) {
+      this.phaseOffSince ||= now;
+      snap = now - this.phaseOffSince > PHASE_SNAP_AFTER;
+    } else if (!snap) {
+      this.phaseOffSince = 0;
+    }
     if (snap) {
-      if (Math.abs(diff) > 0.01) this.seek(this.position + diff * this.trackBeatSec());
-      this.phaseBend = 0;
-    } else {
-      const b = Math.abs(diff) < 0.006 ? 0 : Math.max(-0.03, Math.min(0.03, diff * 0.35));
-      if (b !== this.phaseBend) {
-        this.phaseBend = b;
-        this.send({ type: 'bend', value: this.manualBend + this.phaseBend });
-      }
+      if (Math.abs(diff) > 0.01) this.seek(this.position + diff * unitSec);
+      this.clearPhaseBend();
+      return;
+    }
+    const b = Math.abs(diff) < 0.006 ? 0 : Math.max(-0.03, Math.min(0.03, diff * 0.35));
+    if (b !== this.phaseBend) {
+      this.phaseBend = b;
+      this.send({ type: 'bend', value: this.manualBend + this.phaseBend });
     }
   }
 
@@ -445,15 +499,11 @@ export class Deck {
 
   // per-frame upkeep called by the app
   tick() {
-    if (this.sync) {
-      const m = this.app.masterFor(this);
-      if (m && m !== this) {
-        this.followMaster(m);
-        if (this.playing && !this.jogTouched) this.syncPhase(false);
-      }
-    } else if (this.phaseBend) {
-      this.phaseBend = 0;
-      this.send({ type: 'bend', value: this.manualBend });
+    const m = this.sync ? this.app.leader : null;
+    if (m && m !== this) {
+      this.followMaster(m);
+      if (this.phaseSteady && m.phaseSteady) return this.syncPhase(false, m);
     }
+    this.clearPhaseBend();
   }
 }

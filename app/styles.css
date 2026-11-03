@@ -356,7 +356,6 @@ kbd { background: var(--panel-3); border: 1px solid var(--line-2); border-bottom
   .fx-beats { min-width: 24px; }
 }
 @media (max-width: 1400px) {
-  .grid-menu { display: none; }
   .fx-type { width: 58px; }
   .fx-assign { width: 18px; }
   .strip { width: 54px; }
